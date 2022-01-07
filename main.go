@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
-	"sync"
+	"path/filepath"
+	"sort"
 	"time"
 
 	ini "github.com/go-ini/ini"
@@ -16,11 +18,10 @@ type task struct {
 	starting      time.Time
 	time_estimate time.Duration
 	priority      int
-	urgency       float32
+	urgency       float64
 }
 
 var tasks []task
-var task_lock sync.Mutex
 
 //" I hate time strings " - every programmer who ever lived
 func get_date(str string) time.Time {
@@ -36,44 +37,50 @@ func get_date(str string) time.Time {
 	return t
 }
 
-func read_task(wg *sync.WaitGroup, path string, name string) {
-	defer wg.Done()
-	task_lock.Lock()
-	defer task_lock.Unlock()
+func task_urgency(t task) float64 {
+	if time.Until(t.starting) > 0 {
+		return 0
+	}
+	return 1 - time.Until(t.due).Hours() + float64((t.priority * 10))
+}
+
+func read_task(path string, d fs.DirEntry, err error) error {
+	if d.Name()[0] == '.' {
+		if d.IsDir() {
+			return filepath.SkipDir
+		} else {
+			return nil
+		}
+	}
+	if d.IsDir() {
+		return nil
+	}
 	cfg, err := ini.Load(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 	var t task
-	t.name = name
 
+	t.name = filepath.Base(path)
 	t.due = get_date(cfg.Section("").Key("due").String())
+	s := cfg.Section("").Key("starting").String()
+	if s == "" {
+		t.starting = time.Now()
+	} else {
+		t.starting = get_date(s)
+	}
+	t.time_estimate = time.Minute * time.Duration(cfg.Section("").Key("time_est").MustInt())
+	t.priority, _ = cfg.Section("").Key("priority").Int()
+	if t.priority <= 0 {
+		t.priority = 1
+	}
+	t.urgency = task_urgency(t)
 
 	tasks = append(tasks, t)
+	return nil
 }
 
-func read_task_dir(wg *sync.WaitGroup, path string) {
-	defer wg.Done()
-	taskfiles, err := os.ReadDir(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, f := range taskfiles {
-		f_path := path + "/" + f.Name()
-		if f.Name()[0] == '.' {
-			continue
-		}
-		wg.Add(1)
-		if f.IsDir() {
-			go read_task_dir(wg, path+"/"+f.Name())
-		} else {
-			go read_task(wg, f_path, f.Name())
-		}
-	}
-}
-
-func read_omira_ledger(wg *sync.WaitGroup, path string) {
-	defer wg.Done()
+func read_omira_ledger(path string) {
 	f, err := os.Open(path + "/omira.ledger")
 	if err != nil {
 		log.Fatal(err)
@@ -86,16 +93,16 @@ func read_omira_ledger(wg *sync.WaitGroup, path string) {
 }
 
 func load_state(path string) {
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go read_omira_ledger(&wg, path)
-	go read_task_dir(&wg, path+"/tasks")
-	wg.Wait()
+	read_omira_ledger(path)
+	filepath.WalkDir(path+"/tasks", read_task)
+	sort.Slice(tasks, func(p, q int) bool {
+		return tasks[p].urgency > tasks[q].urgency
+	})
 }
 
 func main() {
 	load_state("/home/r0nk/life")
 	for _, t := range tasks {
-		fmt.Printf("%s due: %s\n", t.name, t.due.String())
+		fmt.Printf("%s urgency: %f\n", t.name, t.urgency)
 	}
 }
