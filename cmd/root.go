@@ -68,17 +68,18 @@ func init_config() {
 		viper.SafeWriteConfigAs(home + "/.omirarc.yaml")
 	}
 
-	wp := viper.GetString("working_path")
-	if wp == "" {
+	state.Working_path = viper.GetString("working_path")
+	if state.Working_path == "" {
 		log.Fatal("working_path not found, it must be added to the config file or passed as a -p argument\n")
 	}
-	state.Load_Tasks(wp)
+	os.Chdir(state.Working_path)
+	state.Load_Tasks()
 }
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.PersistentFlags().StringVar(&cfg_file, "config", "", "config file (default is $HOME/.config/omirarc)")
-	rootCmd.PersistentFlags().StringP("working_path", "p", "", "config file (default is $HOME/.config/omirarc)")
+	rootCmd.PersistentFlags().StringVar(&cfg_file, "config", "", "Config file (default is $HOME/.config/omirarc)")
+	rootCmd.PersistentFlags().StringP("working_path", "p", "", "Directory to read tasks and setup calender days")
 	viper.BindPFlag("working_path", rootCmd.PersistentFlags().Lookup("working_path"))
 	cobra.OnInitialize(init_config)
 

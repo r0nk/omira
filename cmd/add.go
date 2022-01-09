@@ -1,40 +1,46 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
-	"fmt"
+	"time"
 
+	state "github.com/r0nk/omira/state"
 	"github.com/spf13/cobra"
 )
+
+var due_string string
+var task_to_add state.Task
+var time_estimate float64
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Add a task.",
+	Long: `Add a task.
+Example:
+	omira add -d "1 week" -t 15 -n cook_the_bacon`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+		if len(args) < 1 && task_to_add.Name == "" {
+			cmd.Help()
+			return
+		}
+		if task_to_add.Name == "" {
+			task_to_add.Name = args[0]
+		}
+
+		if due_string == "1 week" {
+			task_to_add.Due = time.Now().AddDate(0, 0, 7)
+		} else {
+			task_to_add.Due = state.Get_date(due_string)
+		}
+		task_to_add.Time_estimate = time.Duration(time_estimate) * time.Minute
+
+		state.Add_Task(task_to_add)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	scheduleCmd.Flags().StringVarP(&due_string, "due", "d", "1 week", "Set the due date for the task.")
+	scheduleCmd.Flags().Float64VarP(&time_estimate, "time_estimate", "t", 60, "Set the estimated time of the task in minutes.")
+	scheduleCmd.Flags().StringVarP(&task_to_add.Name, "name", "n", "", "The name for the task. ")
 }

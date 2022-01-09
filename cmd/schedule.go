@@ -1,11 +1,11 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	state "github.com/r0nk/omira/state"
@@ -14,7 +14,16 @@ import (
 
 var working_hours float64
 
-// scheduleCmd represents the schedule command
+func create_today() *bufio.Writer {
+	path := state.Date_to_path(time.Now())
+	os.MkdirAll(filepath.Dir(path), 0770)
+	file, err := os.Create(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return bufio.NewWriter(file)
+}
+
 var scheduleCmd = &cobra.Command{
 	Use:   "schedule",
 	Short: "Schedule a number of tasks to be completed today.",
@@ -23,12 +32,15 @@ Example;
 	omira schedule -w 5 #schedule 5 hours worth of tasks today
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
+		writer := create_today()
+		defer writer.Flush()
 		var minutes_worked time.Duration
 		var schedule []state.Task
 		for _, t := range state.Tasks {
 			schedule = append(schedule, t)
 			minutes_worked = minutes_worked + t.Time_estimate
 			fmt.Printf("%s\n", t.Name)
+			fmt.Fprintf(writer, "%s\n", t.Name)
 			if minutes_worked >= time.Duration(working_hours)*time.Hour {
 				break
 			}
@@ -38,15 +50,5 @@ Example;
 
 func init() {
 	rootCmd.AddCommand(scheduleCmd)
-	// Here you will define your flags and configuration settings.
-
 	scheduleCmd.Flags().Float64VarP(&working_hours, "working_hours", "w", 8, "Set the number of hours the tasks will fill.")
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// scheduleCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// scheduleCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -1,6 +1,7 @@
-package data
+package state
 
 import (
+	"bufio"
 	"fmt"
 	"io/fs"
 	"log"
@@ -15,11 +16,11 @@ import (
 
 type Task struct {
 	Name          string
-	Due           time.Time
+	Due           time.Time `yaml:",flow"`
 	starting      time.Time
 	Time_estimate time.Duration
 	priority      int
-	Urgency       float64
+	Urgency       float64 `yaml:",omitempty"`
 }
 
 var Tasks []Task
@@ -27,7 +28,7 @@ var Tasks []Task
 var root_path string
 
 //" I hate time strings " - every programmer who ever lived
-func get_date(str string) time.Time {
+func Get_date(str string) time.Time {
 	t, err := time.Parse("2006-01-02T15:04-07:00", str)
 	if err != nil {
 		t, err = time.Parse("15:04", str)
@@ -68,12 +69,12 @@ func read_task(path string, d fs.DirEntry, err error) error {
 	var t Task
 
 	t.Name = strings.TrimPrefix(path, root_path)
-	t.Due = get_date(cfg.Section("").Key("due").String())
+	t.Due = Get_date(cfg.Section("").Key("due").String())
 	s := cfg.Section("").Key("starting").String()
 	if s == "" {
 		t.starting = time.Now()
 	} else {
-		t.starting = get_date(s)
+		t.starting = Get_date(s)
 	}
 	t.Time_estimate = time.Minute * time.Duration(cfg.Section("").Key("time_est").MustInt())
 	t.priority, _ = cfg.Section("").Key("priority").Int()
@@ -98,11 +99,33 @@ func read_omira_ledger(path string) {
 	fmt.Printf("b:%s\n", b)
 }
 
-func Load_Tasks(path string) {
+func Load_Tasks() {
 	//	read_omira_ledger(path)
-	root_path = path + "/tasks/"
+	root_path = "tasks/"
 	filepath.WalkDir(root_path, read_task)
 	sort.Slice(Tasks, func(p, q int) bool {
 		return Tasks[p].Urgency > Tasks[q].Urgency
 	})
+}
+
+func Add_Task(t Task) {
+	var path string
+	path = "tasks/" + t.Name
+	file, err := os.Create(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	writer := bufio.NewWriter(file)
+	defer writer.Flush()
+
+	fmt.Fprintf(writer, "due:\t%s\n", t.Due.Format("2006-01-02T15:04-07:00"))
+	fmt.Fprintf(writer, "time_est:\t%.0f\n", t.Time_estimate.Minutes())
+
+	/*
+		bytes, err := yaml.Marshal(t)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(bytes))
+	*/
 }
