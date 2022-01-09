@@ -34,7 +34,6 @@ func write_task_to_ledger(task_to_remove state.Task) {
 	s := strings.Replace(string(bytes), "\n", "\n\t", -1)
 	s = strings.Replace(s, "name: "+task_to_remove.Name+"\n", "", -1)
 	fmt.Fprintln(writer, s)
-	os.Remove("tasks/" + task_to_remove.Name)
 }
 
 // finishCmd represents the finish command
@@ -61,8 +60,10 @@ to quickly create a Cobra application.`,
 		}
 		if task_to_remove.Name == "" {
 			fmt.Printf("Could not find task;%s\n", args[0])
+			return
 		}
 		write_task_to_ledger(task_to_remove)
+		os.Remove("tasks/" + task_to_remove.Name)
 	},
 }
 
