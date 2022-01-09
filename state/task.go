@@ -87,18 +87,6 @@ func read_task(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
-func read_omira_ledger(path string) {
-	f, err := os.Open(path + "/omira.ledger")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	const max_size = 50
-	b := make([]byte, max_size)
-	f.Read(b)
-	fmt.Printf("b:%s\n", b)
-}
-
 func Load_Tasks() {
 	//	read_omira_ledger(path)
 	root_path = "tasks/"

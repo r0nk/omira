@@ -73,7 +73,7 @@ func init_config() {
 		log.Fatal("working_path not found, it must be added to the config file or passed as a -p argument\n")
 	}
 	os.Chdir(state.Working_path)
-	state.Load_Tasks()
+	state.Load()
 }
 
 func init() {
