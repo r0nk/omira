@@ -1,0 +1,7 @@
+We only need to worry about 3 levels of recurrence,
+   *month
+   *day of month
+   *day of week
+
+Anything on a smaller timeframe we won't consider
+we'd also want to handle more complex cases, but that should work for now.

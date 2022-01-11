@@ -1,0 +1,13 @@
+1 0 * * * cp ~/life/tasks/.template/make_bed ~/life/tasks
+1 0 * * 1,2,3,4,5 cp ~/life/tasks/.template/30 ~/life/tasks/college/study
+1 0 * * 1,2,4,5 cp ~/life/tasks/.template/30 ~/life/tasks/run
+1 0 20 * * cp ~/life/tasks/.template/rent ~/life/tasks
+1 0 * * TUE cp ~/life/tasks/.template/trashout ~/life/tasks
+1 0 * * MON cp ~/life/tasks/.template/lift ~/life/tasks
+1 0 * * WED cp ~/life/tasks/.template/lift ~/life/tasks
+1 0 * * FRI cp ~/life/tasks/.template/lift ~/life/tasks
+1 0 * * WED cp ~/life/tasks/.template/60 ~/life/tasks/deliveries
+1 0 * * MON cp ~/life/tasks/.template/60 ~/life/tasks/deliveries
+1 0 * * SAT cp ~/life/tasks/.template/15 ~/life/tasks/clear_inbox
+1 0 * * SUN cp ~/life/tasks/.template/60 ~/life/tasks/meal_prep
+1 0 1 * * cp ~/life/tasks/.template/balance_finances ~/life/tasks/monthly_review

@@ -40,7 +40,7 @@ Example:
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-	scheduleCmd.Flags().StringVarP(&due_string, "due", "d", "1 week", "Set the due date for the task.")
-	scheduleCmd.Flags().Float64VarP(&time_estimate, "time_estimate", "t", 60, "Set the estimated time of the task in minutes.")
-	scheduleCmd.Flags().StringVarP(&task_to_add.Name, "name", "n", "", "The name for the task. ")
+	addCmd.Flags().StringVarP(&due_string, "due", "d", "1 week", "Set the due date for the task.")
+	addCmd.Flags().Float64VarP(&time_estimate, "time_estimate", "t", 60, "Set the estimated time of the task in minutes.")
+	addCmd.Flags().StringVarP(&task_to_add.Name, "name", "n", "", "The name for the task. ")
 }

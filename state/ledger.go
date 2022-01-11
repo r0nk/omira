@@ -1,7 +1,7 @@
 package state
 
 import (
-	"bufio"
+	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -19,14 +19,15 @@ func read_omira_ledger(path string) {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	scanner := bufio.NewScanner(f)
-	today := time.Now()
-	for scanner.Scan() {
-		re := regexp.MustCompile("^" + today.Format("2006-01-02"))
-		if re.MatchString(scanner.Text()) {
-			field := strings.Fields(scanner.Text())
-			Finished_task_names = append(Finished_task_names, field[1])
-		}
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	re := regexp.MustCompile("\n" + time.Now().Format("2006-01-02") + "[^\n].*")
+	for _, str := range re.FindAllString(string(data), -1) {
+		field := strings.Fields(str)
+		Finished_task_names = append(Finished_task_names, field[1])
 	}
 	todays_tasks := read_todays_tasks()
 	for _, t := range todays_tasks {

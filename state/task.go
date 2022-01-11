@@ -17,7 +17,7 @@ import (
 type Task struct {
 	Name          string
 	Due           time.Time `yaml:",flow"`
-	starting      time.Time
+	Starting      time.Time
 	Time_estimate time.Duration
 	priority      int
 	Urgency       float64 `yaml:",omitempty"`
@@ -42,7 +42,7 @@ func Get_date(str string) time.Time {
 }
 
 func task_urgency(t Task) float64 {
-	if time.Until(t.starting) > 0 {
+	if time.Until(t.Starting) > 0 {
 		return 0
 	}
 	return 1 - time.Until(t.Due).Hours() + float64((t.priority * 10))
@@ -72,9 +72,9 @@ func read_task(path string, d fs.DirEntry, err error) error {
 	t.Due = Get_date(cfg.Section("").Key("due").String())
 	s := cfg.Section("").Key("starting").String()
 	if s == "" {
-		t.starting = time.Now()
+		t.Starting = time.Now()
 	} else {
-		t.starting = Get_date(s)
+		t.Starting = Get_date(s)
 	}
 	t.Time_estimate = time.Minute * time.Duration(cfg.Section("").Key("time_est").MustInt())
 	t.priority, _ = cfg.Section("").Key("priority").Int()

@@ -37,6 +37,9 @@ Example;
 		var minutes_worked time.Duration
 		var schedule []state.Task
 		for _, t := range state.Tasks {
+			if t.Starting.Before(time.Now()) {
+				continue
+			}
 			schedule = append(schedule, t)
 			minutes_worked = minutes_worked + t.Time_estimate
 			fmt.Printf("%s\n", t.Name)
