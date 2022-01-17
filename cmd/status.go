@@ -45,7 +45,7 @@ to quickly create a Cobra application.`,
 				fmt.Printf("%s", "█")
 			}
 		}
-		fmt.Printf("\n")
+		fmt.Printf("\x1b[0m\n")
 	},
 }
 
