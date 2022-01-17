@@ -70,20 +70,7 @@ func Should_recur(rstr string, at time.Time) bool {
 	return true
 }
 
-func read_task(path string, d fs.DirEntry, err error) error {
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.Name()[0] == '.' {
-		if d.IsDir() {
-			return filepath.SkipDir
-		} else {
-			return nil
-		}
-	}
-	if d.IsDir() {
-		return nil
-	}
+func task_from_path(path string) Task {
 	cfg, err := ini.Load(path)
 	if err != nil {
 		log.Fatal(err)
@@ -104,14 +91,50 @@ func read_task(path string, d fs.DirEntry, err error) error {
 	t.Urgency = task_urgency(t)
 
 	t.Recurrance = cfg.Section("").Key("recurrance").String()
+	return t
+}
 
-	Tasks = append(Tasks, t)
+func read_task(path string, d fs.DirEntry, err error) error {
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.Name()[0] == '.' {
+		if d.IsDir() {
+			return filepath.SkipDir
+		} else {
+			return nil
+		}
+	}
+	if d.IsDir() {
+		return nil
+	}
+	Tasks = append(Tasks, task_from_path(path))
+	return nil
+}
+
+func handle_recurring(path string, d fs.DirEntry, err error) error {
+	if err != nil {
+		log.Fatal(err)
+	}
+	if d.IsDir() {
+		return nil
+	}
+	t := task_from_path(path)
+
+	if Should_recur(t.Recurrance, time.Now()) {
+		fmt.Printf("")
+
+		err := cp.Copy(root_path+t.Name, root_path+strings.TrimPrefix(t.Name, ".recurring"))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return nil
 }
 
 func Load_Tasks() {
-	//	read_omira_ledger(path)
 	root_path = "tasks/"
+	filepath.WalkDir(root_path+".recurring", handle_recurring)
 	filepath.WalkDir(root_path, read_task)
 	sort.Slice(Tasks, func(p, q int) bool {
 		return Tasks[p].Urgency > Tasks[q].Urgency
