@@ -63,7 +63,10 @@ to quickly create a Cobra application.`,
 			return
 		}
 		write_task_to_ledger(task_to_remove)
-		os.Remove("tasks/" + task_to_remove.Name)
+		err := os.Remove("tasks/" + task_to_remove.Name)
+		if err != nil {
+			fmt.Printf("could not remove task:%s\n", err)
+		}
 	},
 }
 
