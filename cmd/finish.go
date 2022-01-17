@@ -62,11 +62,12 @@ to quickly create a Cobra application.`,
 			fmt.Printf("Could not find task;%s\n", args[0])
 			return
 		}
-		write_task_to_ledger(task_to_remove)
 		err := os.Remove("tasks/" + task_to_remove.Name)
 		if err != nil {
-			fmt.Printf("could not remove task:%s\n", err)
+			fmt.Printf("Could not remove old task.\n")
+			log.Fatal(err)
 		}
+		write_task_to_ledger(task_to_remove)
 	},
 }
 
