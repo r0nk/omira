@@ -1,6 +1,9 @@
 # Omira
 
 Omira is a personal task manager based on the unix philosophy.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/r0nk/omira/main/images/usage.png">
+</p>
 
 ## Installation
 
