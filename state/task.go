@@ -29,20 +29,6 @@ var Tasks []Task
 
 var root_path string
 
-//" I hate time strings " - every programmer who ever lived
-func Get_date(str string) time.Time {
-	t, err := time.Parse("2006-01-02T15:04-07:00", str)
-	if err != nil {
-		t, err = time.Parse("15:04", str)
-		if err != nil {
-			log.Fatal(err)
-		}
-		n := time.Now()
-		t = t.AddDate(int(n.Year()), int(n.Month())-1, int(n.Day())-1)
-	}
-	return t
-}
-
 func task_urgency(t Task) float64 {
 	if time.Until(t.Starting) > 0 {
 		return 0

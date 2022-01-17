@@ -9,6 +9,20 @@ import (
 	"time"
 )
 
+//" I hate time strings " - every programmer who ever lived
+func Get_date(str string) time.Time {
+	t, err := time.Parse("2006-01-02T15:04-07:00", str)
+	if err != nil {
+		t, err = time.Parse("15:04", str)
+		if err != nil {
+			log.Fatal(err)
+		}
+		n := time.Now()
+		t = t.AddDate(int(n.Year()), int(n.Month())-1, int(n.Day())-1)
+	}
+	return t
+}
+
 func Date_to_path(date time.Time) string {
 	return date.Format("calendar/2006/January/02")
 }
@@ -74,7 +88,7 @@ func Schedule(working_hours float64) {
 		minutes_worked = minutes_worked + t.Time_estimate
 		fmt.Fprintf(writer, "%s\n", t.Name)
 	}
-	if minutes_worked < (working_hours * 60) {
+	if minutes_worked < (time.Duration(working_hours) * 60) {
 		fmt.Printf("Task queue underrun.")
 	}
 }
