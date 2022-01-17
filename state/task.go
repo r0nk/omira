@@ -132,6 +132,11 @@ func Load_Tasks() {
 	})
 }
 
+func midnight_tonight() time.Time {
+	t := time.Now()
+	return time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location())
+}
+
 func Add_Task(t Task) {
 	var path string
 	path = "tasks/" + t.Name
@@ -145,11 +150,7 @@ func Add_Task(t Task) {
 	fmt.Fprintf(writer, "due:\t%s\n", t.Due.Format("2006-01-02T15:04-07:00"))
 	fmt.Fprintf(writer, "time_est:\t%.0f\n", t.Time_estimate.Minutes())
 
-	/*
-		bytes, err := yaml.Marshal(t)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(string(bytes))
-	*/
+	if t.Due.Before(midnight_tonight()) {
+		append_today(t.Name)
+	}
 }

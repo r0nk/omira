@@ -23,6 +23,16 @@ func create_today() *bufio.Writer {
 	return bufio.NewWriter(file)
 }
 
+func append_today(s string) {
+	path := Date_to_path(time.Now())
+	file, err := os.OpenFile(path, os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	file.WriteString(s)
+}
+
 func read_todays_tasks() []string {
 	f, err := os.Open(Date_to_path(time.Now()))
 	var ret []string
