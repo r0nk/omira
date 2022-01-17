@@ -70,8 +70,8 @@ func init_config() {
 
 	state.Working_path = viper.GetString("working_path")
 	if state.Working_path == "" {
-		fmt.Printf("Quick setup for config file and omira directory: \n")
-		fmt.Printf("$ mkdir omira/ && echo working_path: $(pwd)/omira >> ~/.omirarc.yaml \n")
+		fmt.Printf("\nQuick setup for config file and omira directory: \n\n")
+		fmt.Printf(" $ mkdir omira/ && echo working_path: $(pwd)/omira >> ~/.omirarc.yaml \n\n")
 		log.Fatal("working_path not found, it must be added to the config file or passed as a -p argument\n")
 	}
 	os.Chdir(state.Working_path)
