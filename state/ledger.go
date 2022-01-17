@@ -16,7 +16,7 @@ var Unfinished_task_names []string
 func read_omira_ledger(path string) {
 	f, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer f.Close()
 	data, err := ioutil.ReadFile(path)
