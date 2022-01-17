@@ -75,6 +75,7 @@ func init_config() {
 		log.Fatal("working_path not found, it must be added to the config file or passed as a -p argument\n")
 	}
 	os.Chdir(state.Working_path)
+	os.MkdirAll("tasks/.recurring/", 0770)
 	state.Load()
 }
 

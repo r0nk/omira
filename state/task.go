@@ -96,6 +96,7 @@ func task_from_path(path string) Task {
 
 func read_task(path string, d fs.DirEntry, err error) error {
 	if err != nil {
+		fmt.Printf("Could not open task directory, did you add a task?\n")
 		log.Fatal(err)
 	}
 	if d.Name()[0] == '.' {
@@ -113,10 +114,7 @@ func read_task(path string, d fs.DirEntry, err error) error {
 }
 
 func handle_recurring(path string, d fs.DirEntry, err error) error {
-	if err != nil {
-		log.Fatal(err)
-	}
-	if d.IsDir() {
+	if err != nil || d.IsDir() {
 		return nil
 	}
 	t := task_from_path(path)
@@ -149,6 +147,7 @@ func midnight_tonight() time.Time {
 func Add_Task(t Task) {
 	var path string
 	path = "tasks/" + t.Name
+	os.MkdirAll(filepath.Dir(path), 0770)
 	file, err := os.Create(path)
 	if err != nil {
 		log.Fatal(err)
