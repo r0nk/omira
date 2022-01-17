@@ -13,7 +13,7 @@ var Discipline float64
 var Finished_task_names []string
 var Unfinished_task_names []string
 
-func read_omira_ledger(path string) {
+func read_omira_ledger(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -43,4 +43,5 @@ func read_omira_ledger(path string) {
 		}
 	}
 	Discipline = 100 * (1.0 - (float64(len(Unfinished_task_names)) / float64(len(todays_tasks))))
+	return nil
 }
