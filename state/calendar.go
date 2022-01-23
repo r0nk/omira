@@ -72,6 +72,7 @@ func Schedule(working_hours float64) {
 	writer := create_today()
 	defer writer.Flush()
 	var minutes_worked time.Duration
+	Insert_recurring_tasks()
 	var schedule []Task
 	for _, t := range Tasks {
 		if minutes_worked >= time.Duration(working_hours)*time.Hour {

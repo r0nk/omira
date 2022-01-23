@@ -130,9 +130,12 @@ func handle_recurring(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
+func Insert_recurring_tasks() {
+	filepath.WalkDir(root_path+".recurring", handle_recurring)
+}
+
 func Load_Tasks() {
 	root_path = "tasks/"
-	filepath.WalkDir(root_path+".recurring", handle_recurring)
 	filepath.WalkDir(root_path, read_task)
 	sort.Slice(Tasks, func(p, q int) bool {
 		return Tasks[p].Urgency > Tasks[q].Urgency
