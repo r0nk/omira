@@ -25,8 +25,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
-		for _, t := range state.Finished_tasks {
-			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
+		for _, t := range state.Finished_task_names {
+			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t))
 		}
 
 		var last_minutes_value float64
