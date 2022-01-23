@@ -25,12 +25,22 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
-		for _, string := range state.Finished_task_names {
-			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", string))
+		for _, t := range state.Finished_tasks {
+			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
 		}
 
-		for _, string := range state.Unfinished_task_names {
-			fmt.Printf("%s\n", string)
+		var last_minutes_value float64
+		last_minutes_value = -1.0
+		for _, t := range state.Unfinished_tasks {
+			fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
+			if t.Time_estimate.Minutes() != last_minutes_value {
+				fmt.Printf("%2.0f ", t.Time_estimate.Minutes())
+				last_minutes_value = t.Time_estimate.Minutes()
+			} else {
+				fmt.Printf("   ")
+			}
+			fmt.Printf("\x1b[0m")
+			fmt.Printf("%s\n", t.Name)
 		}
 		fmt.Printf("%s", text.Colors{text.FgCyan}.EscapeSeq())
 		day_percentage := float64(100.0 * ((float64(time.Now().Hour()) - 7) / 16))
@@ -51,14 +61,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(statusCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// statusCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// statusCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

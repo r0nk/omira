@@ -66,8 +66,18 @@ func Should_recur(rstr string, at time.Time) bool {
 			return false
 		}
 	}
-
 	return true
+}
+
+func Task_from_name(name string) Task {
+	for _, t := range Tasks {
+		if t.Name == name {
+			return t
+		}
+	}
+	log.Fatal("Could not find task with name: " + name)
+	var t Task
+	return t
 }
 
 func task_from_path(path string) Task {

@@ -47,9 +47,9 @@ func append_today(s string) {
 	file.WriteString(s)
 }
 
-func read_todays_tasks() []string {
+func read_todays_tasks() []Task {
 	f, err := os.Open(Date_to_path(time.Now()))
-	var ret []string
+	var ret []Task
 	if err != nil {
 		return ret
 	}
@@ -57,7 +57,7 @@ func read_todays_tasks() []string {
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		ret = append(ret, scanner.Text())
+		ret = append(ret, Task_from_name(scanner.Text()))
 	}
 	return ret
 }
