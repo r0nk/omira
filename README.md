@@ -27,7 +27,8 @@ omira status
 # print the tasks in a scriptable format
 omira task
 ```
-
+## Documentation
+[Getting started guide](https://github.com/r0nk/omira/blob/main/doc/getting_started.md)
 ## Contributing
 The project is currently still in alpha, but pull requests are welcome.
 
