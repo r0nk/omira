@@ -1,9 +1,6 @@
 package state
 
-import (
-	"testing"
-)
-
+/*
 func TestRead_omira_ledger(t *testing.T) {
 	read_omira_ledger("../tests/test.ledger")
 	if len(Finished_task_names) == 0 {
@@ -14,3 +11,4 @@ func TestRead_omira_ledger(t *testing.T) {
 			Finished_task_names[0], "make_bed")
 	}
 }
+*/
