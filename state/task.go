@@ -132,6 +132,8 @@ func handle_recurring(path string, d fs.DirEntry, err error) error {
 
 func Insert_recurring_tasks() {
 	filepath.WalkDir(root_path+".recurring", handle_recurring)
+	Tasks = nil
+	Load_Tasks()
 }
 
 func Load_Tasks() {
