@@ -14,13 +14,8 @@ import (
 // disciplineCmd represents the discipline command
 var disciplineCmd = &cobra.Command{
 	Use:   "discipline",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Print the percentage of tasks complete today.",
+	Long:  `Output the percentage of tasks complete to day, to be used in scripts or conkys.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("%f\n", state.Discipline)
 	},

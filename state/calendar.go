@@ -75,7 +75,7 @@ func Schedule(working_hours float64) {
 	Insert_recurring_tasks()
 	var schedule []Task
 	for _, t := range Tasks {
-		if minutes_worked >= time.Duration(working_hours)*time.Hour {
+		if minutes_worked+t.Time_estimate >= time.Duration(working_hours)*time.Hour {
 			check_deadline(t, time.Now())
 			continue
 		}
@@ -85,8 +85,8 @@ func Schedule(working_hours float64) {
 		if !t.Starting.Before(time.Now()) {
 			continue
 		}
+		minutes_worked += t.Time_estimate
 		schedule = append(schedule, t)
-		minutes_worked = minutes_worked + t.Time_estimate
 		fmt.Fprintf(writer, "%s\n", t.Name)
 	}
 	if minutes_worked < (time.Duration(working_hours) * 60) {

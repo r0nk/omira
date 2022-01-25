@@ -21,13 +21,11 @@ var cfg_file string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "omira",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Omira is a personal task manager based on the unix philosophy.",
+	Long: `
+Omira is a personal task manager and scheduler that assigns tasks to be done every day.
+It stores its information in an easily scriptable directory,
+defined in its configuration file (default .omirarc.yaml).`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

@@ -16,13 +16,10 @@ import (
 // statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Pretty print todays tasks and progress bar.",
+	Long: `Pretty print todays tasks and a progress bar. The bar fills based on
+task completion, and is colored based on how much time is left in the day.
+Finished tasks are greyed out, and the unfinished tasks are organized by time estimates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
 		for _, t := range state.Finished_task_names {
