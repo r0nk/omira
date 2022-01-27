@@ -73,6 +73,16 @@ func Schedule(working_hours float64) {
 	defer writer.Flush()
 	var minutes_worked time.Duration
 	Insert_recurring_tasks()
+
+	ks := Knapsack(len(Tasks), int(working_hours*60), func(i int) int {
+		return int(Tasks[i].Urgency)
+	}, func(i int) int {
+		return int(Tasks[i].Time_estimate.Minutes())
+	})
+	for i := range ks {
+		fmt.Printf("%d\n", i)
+	}
+
 	var schedule []Task
 	for _, t := range Tasks {
 		if minutes_worked+t.Time_estimate >= time.Duration(working_hours)*time.Hour {
