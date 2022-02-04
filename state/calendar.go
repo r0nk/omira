@@ -79,9 +79,6 @@ func Schedule(working_hours float64) {
 	}, func(i int) int {
 		return int(Tasks[i].Time_estimate.Minutes())
 	})
-	for i := range ks {
-		fmt.Printf("%d\n", i)
-	}
 
 	var schedule []Task
 	for _, t := range Tasks {
@@ -92,6 +89,9 @@ func Schedule(working_hours float64) {
 		if t.Recurrance != "" && Should_recur(t.Recurrance, time.Now()) {
 			copy_to_recurrance_directory(t)
 		}
+	}
+	for _, v := range ks {
+		t := Tasks[v]
 		if !t.Starting.Before(time.Now()) {
 			continue
 		}
