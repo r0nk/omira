@@ -87,7 +87,6 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 		discipline_percentage_color(state.Discipline)
 		fmt.Printf(" %0.1f\n", state.Discipline)
 		fmt.Printf("\x1b[0m")
-		fmt.Printf("%s\n", unicode_bar_from_percentage(state.Discipline))
 	},
 }
 
