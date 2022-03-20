@@ -13,6 +13,38 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func unicode_bar_from_percentage(x float64) string {
+	switch {
+	case x > 100-((100/8)*1):
+		return "\u2588"
+	case x > 100-((100/8)*2):
+		return "\u2587"
+	case x > 100-((100/8)*3):
+		return "\u2586"
+	case x > 100-((100/8)*4):
+		return "\u2585"
+	case x > 100-((100/8)*5):
+		return "\u2584"
+	case x > 100-((100/8)*6):
+		return "\u2583"
+	case x > 100-((100/8)*7):
+		return "\u2582"
+	}
+	return "\u2581"
+}
+
+func discipline_percentage_color(x float64) (int, error) {
+	switch {
+	case x == 100.0:
+		return fmt.Printf("%s", text.Colors{text.FgHiCyan}.EscapeSeq())
+	case x > 80.0:
+		return fmt.Printf("%s", text.Colors{text.FgGreen}.EscapeSeq())
+	case x > 60.0:
+		return fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
+	}
+	return fmt.Printf("%s", text.Colors{text.FgRed}.EscapeSeq())
+}
+
 // statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
@@ -52,7 +84,10 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 				fmt.Printf("%s", "█")
 			}
 		}
-		fmt.Printf("\x1b[0m\n")
+		discipline_percentage_color(state.Discipline)
+		fmt.Printf(" %0.1f\n", state.Discipline)
+		fmt.Printf("\x1b[0m")
+		fmt.Printf("%s\n", unicode_bar_from_percentage(state.Discipline))
 	},
 }
 
