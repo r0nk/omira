@@ -16,6 +16,7 @@ import (
 )
 
 type Task struct {
+	id            int
 	Name          string
 	Due           time.Time `yaml:",flow"`
 	Starting      time.Time

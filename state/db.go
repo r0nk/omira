@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func create_omira_db(filename string) *sql.DB {
@@ -13,7 +16,11 @@ func create_omira_db(filename string) *sql.DB {
 		log.Fatal(err)
 	}
 	file.Close()
-	odb, _ := sql.Open("sqlite3", filename)
+	odb, err := sql.Open("sqlite3", filename)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 	create_task_statement := `CREATE TABLE tasks (
 	"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
 	"name" TEXT,
@@ -35,12 +42,32 @@ func create_omira_db(filename string) *sql.DB {
 }
 
 func load_task_db() {
-	fmt.Printf("TODO load task db\n")
+	filename := "omira.db"
+	_, err := os.Stat(filename)
 
-	//	filename := "omira.db"
-	//	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
-	//		odb := create_omira_db(filename)
-	//	} else {
-	//		odb, _ := sql.Open("sqlite3", filename)
-	//	}
+	if os.IsNotExist(err) {
+		log.Fatal(err)
+	}
+
+	odb, err := sqlx.Open("sqlite3", filename)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	//if err != nil {
+	//	odb = create_omira_db(filename)
+	//}
+
+	rows, err := odb.Query("select * from tasks;")
+
+	var tasks []Task
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for t := range tasks {
+		fmt.Printf("name: %s\n", tasks[t].Name)
+	}
 }

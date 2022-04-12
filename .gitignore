@@ -1,5 +1,5 @@
 omira.ledger
-omira.db
+*omira.db
 omira
 *.swp
 *.db
