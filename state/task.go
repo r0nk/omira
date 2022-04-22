@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
@@ -15,15 +14,37 @@ import (
 	cp "github.com/otiai10/copy"
 )
 
+/*
+CREATE TABLE tasks (
+        id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        due DATETIME,
+        starting DATETIME,
+        time_estimate INT,
+        finished DATETIME,
+        scheduled DATETIME,
+        priority REAL,
+        urgency REAL,
+        recurrance TEXT,
+        status TEXT,
+        notes TEXT
+);
+CREATE TABLE sqlite_sequence(name,seq);
+*/
+
 type Task struct {
 	id            int
 	Name          string
-	Due           time.Time `yaml:",flow"`
+	Due           time.Time
 	Starting      time.Time
 	Time_estimate time.Duration
+	Finished      time.Time
+	Scheduled     time.Time
 	Priority      int
-	Urgency       float64 `yaml:",omitempty"`
+	Urgency       float64
 	Recurrance    string
+	Status        string
+	Notes         string
 }
 
 var Tasks []Task
@@ -148,11 +169,7 @@ func Insert_recurring_tasks() {
 }
 
 func Load_Tasks() {
-	root_path = "tasks/"
-	filepath.WalkDir(root_path, read_task)
-	sort.Slice(Tasks, func(p, q int) bool {
-		return Tasks[p].Urgency > Tasks[q].Urgency
-	})
+	Tasks = load_task_db("select * from tasks")
 }
 
 func midnight_tonight() time.Time {
