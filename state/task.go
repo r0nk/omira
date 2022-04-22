@@ -3,14 +3,12 @@ package state
 import (
 	"bufio"
 	"fmt"
-	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	ini "github.com/go-ini/ini"
 	cp "github.com/otiai10/copy"
 )
 
@@ -75,6 +73,7 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
+/* this reason this takes the at parameter is in case we're scheduling for the future. */
 func Should_recur(rstr string, at time.Time) bool {
 	now_words := strings.Fields(fmt.Sprintf("%d %d %d \n", int(at.Month()), at.Day(), int(at.Weekday())))
 	recur_words := strings.Fields(rstr)
@@ -102,70 +101,16 @@ func Task_from_name(name string) Task {
 	return t
 }
 
-func task_from_path(path string) Task {
-	cfg, err := ini.Load(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var t Task
-
-	t.Name = strings.TrimPrefix(path, root_path)
-	t.Due = Get_date(cfg.Section("").Key("due").String())
-	s := cfg.Section("").Key("starting").String()
-	if s != "" {
-		t.Starting = Get_date(s)
-	}
-	t.Time_estimate = time.Minute * time.Duration(cfg.Section("").Key("time_est").MustInt())
-	t.Priority, _ = cfg.Section("").Key("priority").Int()
-	if t.Priority <= 0 {
-		t.Priority = 1
-	}
-	t.Urgency = task_urgency(t)
-
-	t.Recurrance = cfg.Section("").Key("recurrance").String()
-	return t
-}
-
-func read_task(path string, d fs.DirEntry, err error) error {
-	if err != nil {
-		fmt.Printf("Could not open task directory, did you add a task?\n")
-		log.Fatal(err)
-	}
-	if d.Name()[0] == '.' {
-		if d.IsDir() {
-			return filepath.SkipDir
-		} else {
-			return nil
-		}
-	}
-	if d.IsDir() {
-		return nil
-	}
-	Tasks = append(Tasks, task_from_path(path))
-	return nil
-}
-
-func handle_recurring(path string, d fs.DirEntry, err error) error {
-	if err != nil || d.IsDir() {
-		return nil
-	}
-	t := task_from_path(path)
-
-	if Should_recur(t.Recurrance, time.Now()) {
-		fmt.Printf("")
-
-		err := cp.Copy(root_path+t.Name, root_path+strings.TrimPrefix(t.Name, ".recurring"))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	return nil
-}
-
 func Insert_recurring_tasks() {
-	filepath.WalkDir(root_path+".recurring", handle_recurring)
-	Tasks = nil
-	Load_Tasks()
+	fmt.Printf("")
+	/*TODO
+	recurring := load_task_db("select * from recurring")
+	for r := range recurring {
+		if Should_recur(r.Recurrance, time.Now()) {
+			Tasks = append(Tasks, t)
+		}
+	}
+	*/
 }
 
 func Load_Tasks() {
