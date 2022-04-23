@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	cp "github.com/otiai10/copy"
 )
 
 /*
@@ -46,6 +44,7 @@ type Task struct {
 }
 
 var Tasks []Task
+var Recurring []Task
 
 var root_path string
 
@@ -54,13 +53,6 @@ func task_urgency(t Task) float64 {
 		return 0
 	}
 	return 1 - time.Until(t.Due).Hours() + float64((t.Priority * 10))
-}
-
-func copy_to_recurrance_directory(t Task) {
-	err := cp.Copy(root_path+t.Name, root_path+".recurring/"+t.Name)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 //https://stackoverflow.com/questions/15323767/does-go-have-if-x-in-construct-similar-to-python
@@ -102,19 +94,16 @@ func Task_from_name(name string) Task {
 }
 
 func Insert_recurring_tasks() {
-	fmt.Printf("")
-	/*TODO
-	recurring := load_task_db("select * from recurring")
-	for r := range recurring {
+	for _, r := range Recurring {
 		if Should_recur(r.Recurrance, time.Now()) {
-			Tasks = append(Tasks, t)
+			Tasks = append(Tasks, r)
 		}
 	}
-	*/
 }
 
 func Load_Tasks() {
-	Tasks = load_task_db("select * from tasks")
+	Tasks = Load_task_db("select * from tasks")
+	Recurring = Load_task_db("select * from tasks")
 }
 
 func midnight_tonight() time.Time {
@@ -137,6 +126,6 @@ func Add_Task(t Task) {
 	fmt.Fprintf(writer, "time_est:\t%.0f\n", t.Time_estimate.Minutes())
 
 	if t.Due.Before(midnight_tonight()) {
-		append_today(t.Name)
+		t.Scheduled = time.Now()
 	}
 }

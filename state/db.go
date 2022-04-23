@@ -44,7 +44,7 @@ CREATE TABLE tasks (
 	return odb
 }
 
-func load_task_db(query string) []Task {
+func Load_task_db(query string) []Task {
 	filename := "omira.db"
 
 	_, err := os.Stat(filename)
