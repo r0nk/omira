@@ -46,11 +46,13 @@ CREATE TABLE tasks (
 
 func Load_task_db(query string) []Task {
 	filename := "omira.db"
+	var tasks []Task
 
 	_, err := os.Stat(filename)
 
 	if os.IsNotExist(err) {
-		log.Fatal(err)
+		fmt.Printf("No omira.db file found, returning empty task list")
+		return tasks
 	}
 
 	odb, err := sql.Open("sqlite3", filename)
@@ -63,8 +65,6 @@ func Load_task_db(query string) []Task {
 	//}
 
 	rows, err := odb.Query(query)
-
-	var tasks []Task
 
 	if err != nil {
 		log.Fatal(err)
@@ -103,9 +103,11 @@ func Load_task_db(query string) []Task {
 
 	defer rows.Close()
 
-	for t := range tasks {
-		fmt.Printf("name: %s\n", tasks[t].Name)
-	}
+	/*
+		for t := range tasks {
+			fmt.Printf("name: %s\n", tasks[t].Name)
+		}
+	*/
 
 	return tasks
 }

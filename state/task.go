@@ -1,11 +1,8 @@
 package state
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -112,20 +109,8 @@ func midnight_tonight() time.Time {
 }
 
 func Add_Task(t Task) {
-	var path string
-	path = "tasks/" + t.Name
-	os.MkdirAll(filepath.Dir(path), 0770)
-	file, err := os.Create(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	writer := bufio.NewWriter(file)
-	defer writer.Flush()
-
-	fmt.Fprintf(writer, "due:\t%s\n", t.Due.Format("2006-01-02T15:04-07:00"))
-	fmt.Fprintf(writer, "time_est:\t%.0f\n", t.Time_estimate.Minutes())
-
 	if t.Due.Before(midnight_tonight()) {
 		t.Scheduled = time.Now()
 	}
+	Tasks = append(Tasks, t)
 }

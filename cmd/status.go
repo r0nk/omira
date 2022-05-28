@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
@@ -45,6 +41,20 @@ func discipline_percentage_color(x float64) (int, error) {
 	return fmt.Printf("%s", text.Colors{text.FgRed}.EscapeSeq())
 }
 
+func percent_to_grade(x float64) byte {
+	switch {
+	case x > 90.0:
+		return 'A'
+	case x > 80.0:
+		return 'B'
+	case x > 70.0:
+		return 'C'
+	case x > 60.0:
+		return 'D'
+	}
+	return 'F'
+}
+
 // statusCmd represents the status command
 var statusCmd = &cobra.Command{
 	Use:   "status",
@@ -73,12 +83,13 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 		}
 		fmt.Printf("%s", text.Colors{text.FgCyan}.EscapeSeq())
 		day_percentage := float64(100.0 * ((float64(time.Now().Hour()) - 7) / 16))
+		discipline := state.Discipline(time.Now())
 
 		for i := 0; i < 100; i += 2 {
 			if float64(i) > day_percentage {
 				fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
 			}
-			if state.Discipline(time.Now()) < float64(i) {
+			if discipline < float64(i) {
 				fmt.Printf("%s", "░")
 			} else {
 				fmt.Printf("%s", "█")
@@ -86,6 +97,19 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 		}
 		discipline_percentage_color(state.Discipline(time.Now()))
 		fmt.Printf(" %0.1f\n", state.Discipline(time.Now()))
+		fmt.Printf("\x1b[0m")
+
+		var avg float64
+		for i := 0; i < 50; i += 1 {
+			d := state.Discipline(time.Now().Add(-time.Hour * time.Duration(-24*i)))
+			avg += d
+			discipline_percentage_color(d)
+			fmt.Printf("%s", unicode_bar_from_percentage(d))
+			fmt.Printf("\x1b[0m")
+		}
+		avg /= 50
+		discipline_percentage_color(avg)
+		fmt.Printf(" %c \n", percent_to_grade(avg))
 		fmt.Printf("\x1b[0m")
 	},
 }

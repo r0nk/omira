@@ -27,11 +27,13 @@ func check_deadline(t Task, current time.Time) {
 }
 
 func Discipline(t time.Time) float64 {
-	fmt.Printf("TODO Discipline\n")
-	return 100
+	d := t.Format("2006-01-02")
+	x := len(Load_task_db("select * from tasks where scheduled ==" + d + " and status != 'FINISHED'"))
+	y := len(Load_task_db("select * from tasks where scheduled ==" + d + " and status == 'FINISHED'"))
+	return float64(y) / float64(x+y)
 }
 
-func Schedule(working_hours float64) {
+func Schedule(working_hours float64) []Task {
 	var minutes_worked time.Duration
 	Insert_recurring_tasks()
 
@@ -59,4 +61,5 @@ func Schedule(working_hours float64) {
 	if minutes_worked < (time.Duration(working_hours) * 60) {
 		fmt.Printf("Task queue underrun.")
 	}
+	return schedule
 }
