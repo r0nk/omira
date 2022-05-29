@@ -2,7 +2,6 @@ package state
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -45,13 +44,13 @@ CREATE TABLE tasks (
 }
 
 func Load_task_db(query string) []Task {
-	filename := "omira.db"
+	filename := "/home/r0nk/life/omira.db"
 	var tasks []Task
 
 	_, err := os.Stat(filename)
 
 	if os.IsNotExist(err) {
-		fmt.Printf("No omira.db file found, returning empty task list")
+		log.Fatal("No omira.db file found, returning empty task list")
 		return tasks
 	}
 
