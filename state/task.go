@@ -100,7 +100,7 @@ func Insert_recurring_tasks() {
 
 func Load_Tasks() {
 	Tasks = Load_task_db("select * from tasks")
-	Recurring = Load_task_db("select * from tasks")
+	Recurring = Load_task_db("select * from recurring")
 }
 
 func midnight_tonight() time.Time {
