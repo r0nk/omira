@@ -43,6 +43,29 @@ CREATE TABLE tasks (
 	return odb
 }
 
+func Apply_task_db_query(query string) {
+	filename := "/home/r0nk/life/omira.db"
+	var tasks []Task
+
+	_, err := os.Stat(filename)
+
+	if os.IsNotExist(err) {
+		log.Fatal("No omira.db file found cannot apply changes.")
+	}
+
+	odb, err := sql.Open("sqlite3", filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	statement, err := odb.Prepare(query)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	statement.Exec()
+	odb.Close()
+}
+
 func Load_task_db(query string) []Task {
 	filename := "/home/r0nk/life/omira.db"
 	var tasks []Task
@@ -59,6 +82,7 @@ func Load_task_db(query string) []Task {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer odb.Close()
 	//if err != nil {
 	//	odb = create_omira_db(filename)
 	//}

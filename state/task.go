@@ -1,8 +1,10 @@
 package state
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -112,5 +114,42 @@ func Add_Task(t Task) {
 	if t.Due.Before(midnight_tonight()) {
 		t.Scheduled = time.Now()
 	}
-	Tasks = append(Tasks, t)
+	filename := "/home/r0nk/life/omira.db"
+	var tasks []Task
+
+	_, err := os.Stat(filename)
+
+	if os.IsNotExist(err) {
+		log.Fatal("No omira.db file found cannot apply changes.")
+	}
+
+	odb, err := sql.Open("sqlite3", filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer odb.Close()
+
+	statement, err := odb.Prepare(query)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	statement.Exec("INSERT INTO TASKS (name,due,starting,time_estimate,finished,scheduled,priority,urgency,recurrance,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);", t.name, t.due, t.starting, t.time_t.estimate, t.finished, t.scheduled, t.priority, t.urgency, t.recurrance, t.status, t.notes)
 }
+
+/*
+CREATE TABLE tasks (
+        id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        due DATETIME,
+        starting DATETIME,
+        time_estimate INT,
+        finished DATETIME,
+        scheduled DATETIME,
+        priority REAL,
+        urgency REAL,
+        recurrance TEXT,
+        status TEXT,
+        notes TEXT
+);
+CREATE TABLE sqlite_sequence(name,seq);
+*/
