@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	state "github.com/r0nk/omira/state"
@@ -10,6 +11,7 @@ import (
 var due_string string
 var task_to_add state.Task
 var time_estimate float64
+var waitcat bool
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
@@ -35,6 +37,11 @@ Example:
 		task_to_add.Time_estimate = time.Duration(time_estimate) * time.Minute
 
 		state.Add_Task(task_to_add)
+		if waitcat {
+			fmt.Printf("waitcat")
+			// Read input into a file to be passed to start command
+			// Print out the output passed to finish
+		}
 	},
 }
 
@@ -43,4 +50,5 @@ func init() {
 	addCmd.Flags().StringVarP(&due_string, "due", "d", "1 week", "Set the due date for the task.")
 	addCmd.Flags().Float64VarP(&time_estimate, "time_estimate", "t", 60, "Set the estimated time of the task in minutes.")
 	addCmd.Flags().StringVarP(&task_to_add.Name, "name", "n", "", "The name for the task. ")
+	addCmd.Flags().BoolVarP(&waitcat, "waitcat", "w", false, "Activate waitcat mode, the program will wait until the task is complete.")
 }

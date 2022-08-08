@@ -1,9 +1,13 @@
 package state
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"time"
+
+	"github.com/johnmuirjr/go-knapsack"
 )
 
 //" I hate time strings " - every programmer who ever lived
@@ -33,33 +37,56 @@ func Discipline(t time.Time) float64 {
 	return float64(y) / float64(x+y)
 }
 
+func set_scheduled_time(t Task) {
+	if t.Due.Before(midnight_tonight()) {
+		t.Scheduled = time.Now()
+	}
+	filename := "/home/r0nk/life/omira.db"
+
+	_, err := os.Stat(filename)
+
+	if os.IsNotExist(err) {
+		log.Fatal("No omira.db file found cannot apply changes.")
+	}
+
+	odb, err := sql.Open("sqlite3", filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer odb.Close()
+
+	statement, err := odb.Prepare("UPDATE tasks SET scheduled = (datetime('now')) WHERE name = ? AND status != 'FINISHED' LIMIT 1;")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	statement.Exec(t.Name)
+}
+
 func Schedule(working_hours float64) []Task {
 	var minutes_worked time.Duration
 	Insert_recurring_tasks()
 
-	ks := Knapsack(len(Tasks), int(working_hours*60), func(i int) int {
-		return int(Tasks[i].Urgency)
-	}, func(i int) int {
-		return int(Tasks[i].Time_estimate.Minutes())
+	ks := knapsack.Get01Solution(uint64(working_hours*60), Tasks, func(t *Task) uint64 {
+		ret := uint64(0)
+		if !t.Starting.Before(time.Now()) {
+			ret += 999999
+		}
+		ret += uint64(t.Time_estimate.Minutes())
+		return ret
+	}, func(t *Task) uint64 {
+		return uint64(t.Urgency)
 	})
-	var schedule []Task
 	for _, t := range Tasks {
 		if minutes_worked+t.Time_estimate >= time.Duration(working_hours)*time.Hour {
 			check_deadline(t, time.Now())
-			continue
 		}
 	}
-	for _, v := range ks {
-		t := Tasks[v]
-		if !t.Starting.Before(time.Now()) {
-			continue
-		}
+	for _, t := range ks {
 		minutes_worked += t.Time_estimate
-		schedule = append(schedule, t)
-		//TODO ADD to today here
+		set_scheduled_time(t)
 	}
 	if minutes_worked < (time.Duration(working_hours) * 60) {
 		fmt.Printf("Task queue underrun.")
 	}
-	return schedule
+	return ks
 }

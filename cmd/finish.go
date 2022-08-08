@@ -35,7 +35,7 @@ For example:
 			fmt.Printf("Could not find task;%s\n", args[0])
 			return
 		}
-		state.Finish_task(args[0])
+		state.Finish_Task(args[0])
 	},
 }
 

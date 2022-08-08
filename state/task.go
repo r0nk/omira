@@ -115,7 +115,6 @@ func Add_Task(t Task) {
 		t.Scheduled = time.Now()
 	}
 	filename := "/home/r0nk/life/omira.db"
-	var tasks []Task
 
 	_, err := os.Stat(filename)
 
@@ -129,19 +128,15 @@ func Add_Task(t Task) {
 	}
 	defer odb.Close()
 
-	statement, err := odb.Prepare(query)
+	statement, err := odb.Prepare("INSERT INTO tasks (name,due,starting,time_estimate,finished,scheduled,priority,urgency,recurrance,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	statement.Exec("INSERT INTO tasks (name,due,starting,time_estimate,finished,scheduled,priority,urgency,recurrance,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);", t.name, t.due, t.starting, t.time_t.estimate, t.finished, t.scheduled, t.priority, t.urgency, t.recurrance, t.status, t.notes)
+	statement.Exec(t.Name, t.Due, t.Starting, t.Time_estimate, t.Finished, t.Scheduled, t.Priority, t.Urgency, t.Recurrance, t.Status, t.Notes)
 }
 
-func Finish_Task(t Task) {
-	if t.Due.Before(midnight_tonight()) {
-		t.Scheduled = time.Now()
-	}
+func Finish_Task(name string) {
 	filename := "/home/r0nk/life/omira.db"
-	var tasks []Task
 
 	_, err := os.Stat(filename)
 
@@ -155,11 +150,11 @@ func Finish_Task(t Task) {
 	}
 	defer odb.Close()
 
-	statement, err := odb.Prepare(query)
+	statement, err := odb.Prepare("UPDATE tasks SET status = 'FINISHED' WHERE name = ? AND status != 'FINISHED' LIMIT 1;")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	statement.Exec("UPDATE tasks SET status = 'FINISHED' WHERE name = ? AND status != 'FINISHED' LIMIT 1;", t.name)
+	statement.Exec(name)
 }
 
 /*

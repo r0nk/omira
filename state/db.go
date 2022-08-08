@@ -45,7 +45,6 @@ CREATE TABLE tasks (
 
 func Apply_task_db_query(query string) {
 	filename := "/home/r0nk/life/omira.db"
-	var tasks []Task
 
 	_, err := os.Stat(filename)
 
