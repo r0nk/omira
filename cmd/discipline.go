@@ -25,5 +25,5 @@ var disciplineCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(disciplineCmd)
-	addCmd.Flags().StringVarP(&date_string, "date", "d", "", "Set the date to get discipline for.")
+	disciplineCmd.Flags().StringVarP(&date_string, "date", "d", "", "Set the date to get discipline for.")
 }

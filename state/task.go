@@ -24,7 +24,6 @@ CREATE TABLE tasks (
         status TEXT,
         notes TEXT
 );
-CREATE TABLE sqlite_sequence(name,seq);
 */
 
 type Task struct {
@@ -156,21 +155,3 @@ func Finish_Task(name string) {
 	}
 	statement.Exec(name)
 }
-
-/*
-CREATE TABLE tasks (
-        id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        due DATETIME,
-        starting DATETIME,
-        time_estimate INT,
-        finished DATETIME,
-        scheduled DATETIME,
-        priority REAL,
-        urgency REAL,
-        recurrance TEXT,
-        status TEXT,
-        notes TEXT
-);
-CREATE TABLE sqlite_sequence(name,seq);
-*/

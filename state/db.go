@@ -34,8 +34,30 @@ CREATE TABLE tasks (
         recurrance TEXT,
         status TEXT,
         notes TEXT
-); `
+);
+`
 	statement, err := odb.Prepare(create_task_statement) // Prepare SQL Statement
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	statement.Exec()
+	create_task_statement = `
+CREATE TABLE recurring (
+        id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        due DATETIME,
+        starting DATETIME,
+        time_estimate INT,
+        finished DATETIME,
+        scheduled DATETIME,
+        priority REAL,
+        urgency REAL,
+        recurrance TEXT,
+        status TEXT,
+        notes TEXT
+);
+`
+	statement, err = odb.Prepare(create_task_statement) // Prepare SQL Statement
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -44,7 +66,7 @@ CREATE TABLE tasks (
 }
 
 func Apply_task_db_query(query string) {
-	filename := "/home/r0nk/life/omira.db"
+	filename := "omira.db"
 
 	_, err := os.Stat(filename)
 
@@ -66,13 +88,14 @@ func Apply_task_db_query(query string) {
 }
 
 func Load_task_db(query string) []Task {
-	filename := "/home/r0nk/life/omira.db"
+	filename := "omira.db"
 	var tasks []Task
 
 	_, err := os.Stat(filename)
 
 	if os.IsNotExist(err) {
-		log.Fatal("No omira.db file found, returning empty task list")
+		create_omira_db(filename)
+		log.Fatal("No omira.db file found, creating one at " + filename)
 		return tasks
 	}
 
@@ -82,9 +105,6 @@ func Load_task_db(query string) []Task {
 		log.Fatal(err)
 	}
 	defer odb.Close()
-	//if err != nil {
-	//	odb = create_omira_db(filename)
-	//}
 
 	rows, err := odb.Query(query)
 
