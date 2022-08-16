@@ -119,8 +119,8 @@ func Load_task_db(query string) []Task {
 		var starting sql.NullTime
 		var finished sql.NullTime
 		var scheduled sql.NullTime
-		var time_estimate sql.NullInt32
-		var priority sql.NullInt32
+		var time_estimate sql.NullInt64
+		var priority sql.NullInt64
 		var urgency sql.NullFloat64
 		var recurrance sql.NullString
 		var status sql.NullString
@@ -130,8 +130,8 @@ func Load_task_db(query string) []Task {
 		t.Starting = starting.Time
 		t.Finished = finished.Time
 		t.Scheduled = scheduled.Time
-		t.Time_estimate = time.Minute * time.Duration(time_estimate.Int32)
-		t.Priority = int(priority.Int32)
+		t.Time_estimate = time.Minute * time.Duration(time_estimate.Int64)
+		t.Priority = int(priority.Int64)
 		t.Urgency = urgency.Float64
 		t.Recurrance = recurrance.String
 		t.Status = status.String

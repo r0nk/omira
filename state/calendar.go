@@ -41,7 +41,7 @@ func set_scheduled_time(t Task) {
 	if t.Due.Before(midnight_tonight()) {
 		t.Scheduled = time.Now()
 	}
-	filename := "/home/r0nk/life/omira.db"
+	filename := "omira.db"
 
 	_, err := os.Stat(filename)
 

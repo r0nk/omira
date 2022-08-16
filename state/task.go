@@ -113,7 +113,7 @@ func Add_Task(t Task) {
 	if t.Due.Before(midnight_tonight()) {
 		t.Scheduled = time.Now()
 	}
-	filename := "/home/r0nk/life/omira.db"
+	filename := "omira.db"
 
 	_, err := os.Stat(filename)
 
@@ -127,15 +127,14 @@ func Add_Task(t Task) {
 	}
 	defer odb.Close()
 
-	statement, err := odb.Prepare("INSERT INTO tasks (name,due,starting,time_estimate,finished,scheduled,priority,urgency,recurrance,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);")
+	statement, err := odb.Prepare("INSERT INTO tasks (name,due,starting,time_estimate,finished,scheduled,priority,urgency,recurrance,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?);")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	statement.Exec(t.Name, t.Due, t.Starting, t.Time_estimate, t.Finished, t.Scheduled, t.Priority, t.Urgency, t.Recurrance, t.Status, t.Notes)
 }
-
 func Finish_Task(name string) {
-	filename := "/home/r0nk/life/omira.db"
+	filename := "omira.db"
 
 	_, err := os.Stat(filename)
 
