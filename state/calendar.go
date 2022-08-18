@@ -32,9 +32,13 @@ func check_deadline(t Task, current time.Time) {
 
 func Discipline(t time.Time) float64 {
 	d := t.Format("2006-01-02")
-	x := len(Load_task_db("select * from tasks where scheduled ==" + d + " and status != 'FINISHED'"))
-	y := len(Load_task_db("select * from tasks where scheduled ==" + d + " and status == 'FINISHED'"))
-	return float64(y) / float64(x+y)
+	x := len(Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == \"" + d + "\" and status != 'FINISHED'"))
+	y := len(Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == \"" + d + "\" and status == 'FINISHED'"))
+
+	if x+y == 0 {
+		return 0
+	}
+	return 100.0 * (float64(y) / float64(x+y))
 }
 
 func set_scheduled_time(t Task) {
@@ -55,7 +59,7 @@ func set_scheduled_time(t Task) {
 	}
 	defer odb.Close()
 
-	statement, err := odb.Prepare("UPDATE tasks SET scheduled = (datetime('now')) WHERE name = ? AND status != 'FINISHED' LIMIT 1;")
+	statement, err := odb.Prepare("UPDATE tasks SET scheduled = (datetime('now')) WHERE name = ? AND status != 'FINISHED'")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -74,8 +78,9 @@ func Schedule(working_hours float64) []Task {
 		ret += uint64(t.Time_estimate.Minutes())
 		return ret
 	}, func(t *Task) uint64 {
-		return uint64(t.Urgency)
+		return uint64(t.Urgency) + 1
 	})
+
 	for _, t := range Tasks {
 		if minutes_worked+t.Time_estimate >= time.Duration(working_hours)*time.Hour {
 			check_deadline(t, time.Now())
@@ -86,7 +91,11 @@ func Schedule(working_hours float64) []Task {
 		set_scheduled_time(t)
 	}
 	if minutes_worked < (time.Duration(working_hours) * 60) {
-		fmt.Printf("Task queue underrun.")
+		fmt.Printf("Task queue underrun.\n")
+	}
+	if minutes_worked == 0 {
+		fmt.Printf("Task queue empty.\n")
+
 	}
 	return ks
 }

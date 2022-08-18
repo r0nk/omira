@@ -46,7 +46,7 @@ var Recurring []Task
 
 var root_path string
 
-func task_urgency(t Task) float64 {
+func Task_urgency(t Task) float64 {
 	if time.Until(t.Starting) > 0 {
 		return 0
 	}
@@ -133,6 +133,7 @@ func Add_Task(t Task) {
 	}
 	statement.Exec(t.Name, t.Due, t.Starting, t.Time_estimate, t.Finished, t.Scheduled, t.Priority, t.Urgency, t.Recurrance, t.Status, t.Notes)
 }
+
 func Finish_Task(name string) {
 	filename := "omira.db"
 
@@ -148,7 +149,7 @@ func Finish_Task(name string) {
 	}
 	defer odb.Close()
 
-	statement, err := odb.Prepare("UPDATE tasks SET status = 'FINISHED' WHERE name = ? AND status != 'FINISHED' LIMIT 1;")
+	statement, err := odb.Prepare("UPDATE tasks SET status = 'FINISHED' WHERE name = ? AND status != 'FAILED';")
 	if err != nil {
 		log.Fatal(err.Error())
 	}

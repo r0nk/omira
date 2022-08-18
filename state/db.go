@@ -130,9 +130,10 @@ func Load_task_db(query string) []Task {
 		t.Starting = starting.Time
 		t.Finished = finished.Time
 		t.Scheduled = scheduled.Time
-		t.Time_estimate = time.Minute * time.Duration(time_estimate.Int64)
+		t.Time_estimate = time.Duration(time_estimate.Int64)
 		t.Priority = int(priority.Int64)
 		t.Urgency = urgency.Float64
+		t.Urgency = Task_urgency(t)
 		t.Recurrance = recurrance.String
 		t.Status = status.String
 		t.Notes = notes.String
@@ -144,7 +145,6 @@ func Load_task_db(query string) []Task {
 	}
 
 	defer rows.Close()
-
 	/*
 		for t := range tasks {
 			fmt.Printf("name: %s\n", tasks[t].Name)
