@@ -101,7 +101,7 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 
 		var avg float64
 		for i := 0; i < 50; i += 1 {
-			d := state.Discipline(time.Now().Add(-time.Hour * time.Duration(24*i)))
+			d := state.Discipline(time.Now().Add(-time.Hour * time.Duration(24*(49-i))))
 			avg += d
 			discipline_percentage_color(d)
 			fmt.Printf("%s", unicode_bar_from_percentage(d))

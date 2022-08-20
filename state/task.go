@@ -50,7 +50,7 @@ func Task_urgency(t Task) float64 {
 	if time.Until(t.Starting) > 0 {
 		return 0
 	}
-	return 1 - time.Until(t.Due).Hours() + float64((t.Priority * 10))
+	return 1000 - time.Until(t.Due).Hours() + float64((t.Priority * 10))
 }
 
 //https://stackoverflow.com/questions/15323767/does-go-have-if-x-in-construct-similar-to-python
