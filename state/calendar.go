@@ -69,17 +69,20 @@ func set_scheduled_time(t Task) {
 func Schedule(working_hours float64) []Task {
 	var minutes_worked time.Duration
 	var total_urgency float64
-	Insert_recurring_tasks()
+	//	Insert_recurring_tasks()
 
 	ks := knapsack.Get01Solution(uint64(working_hours*60), Tasks, func(t *Task) uint64 {
-		ret := uint64(0)
+		ret := uint64(1)
 		if !t.Starting.Before(time.Now()) {
 			ret += 999999
 		}
 		ret += uint64(t.Time_estimate.Minutes())
+		fmt.Printf("name: \"%s\" cost: %d\n", t.Name, ret)
 		return ret
 	}, func(t *Task) uint64 {
-		return uint64(t.Urgency) + 1
+		ret := uint64(t.Urgency) + 1
+		fmt.Printf("urgency: %d\n", ret)
+		return ret
 	})
 
 	for _, t := range Tasks {
@@ -98,7 +101,7 @@ func Schedule(working_hours float64) []Task {
 	if minutes_worked == 0 {
 		fmt.Printf("Task queue empty.\n")
 	}
-	fmt.Printf("Scheduled %d tasks with total urgency %.0f to do in %0.1f/%0.1f hours", len(ks), total_urgency, minutes_worked.Hours(), working_hours)
+	fmt.Printf("Scheduled %d tasks with total urgency %.0f to do in %0.1f/%0.1f hours\n", len(ks), total_urgency, minutes_worked.Hours(), working_hours)
 
 	return ks
 }
