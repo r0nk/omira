@@ -1,10 +1,8 @@
 package state
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/johnmuirjr/go-knapsack"
@@ -32,38 +30,16 @@ func check_deadline(t Task, current time.Time) {
 
 func Discipline(t time.Time) float64 {
 	d := t.Format("2006-01-02")
-	x := len(Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == \"" + d + "\" and status != 'FINISHED'"))
-	y := len(Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == \"" + d + "\" and status == 'FINISHED'"))
+	fmt.Printf("TODO discipline: %s ", d)
+
+	x := 0
+	y := 0
 
 	if x+y == 0 {
 		return 0
 	}
 	return 100.0 * (float64(y) / float64(x+y))
-}
-
-func set_scheduled_time(t Task) {
-	if t.Due.Before(midnight_tonight()) {
-		t.Scheduled = time.Now()
-	}
-	filename := "omira.db"
-
-	_, err := os.Stat(filename)
-
-	if os.IsNotExist(err) {
-		log.Fatal("No omira.db file found cannot apply changes.")
-	}
-
-	odb, err := sql.Open("sqlite3", filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer odb.Close()
-
-	statement, err := odb.Prepare("UPDATE tasks SET scheduled = (datetime('now')) WHERE name = ? AND status != 'FINISHED'")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	statement.Exec(t.Name)
+	return 0
 }
 
 func Schedule(working_hours float64) []Task {
@@ -77,11 +53,11 @@ func Schedule(working_hours float64) []Task {
 			ret += 999999
 		}
 		ret += uint64(t.Time_estimate.Minutes())
-		fmt.Printf("name: \"%s\" cost: %d\n", t.Name, ret)
+		//		fmt.Printf("name: \"%s\" cost: %d\n", t.Name, ret)
 		return ret
 	}, func(t *Task) uint64 {
 		ret := uint64(t.Urgency) + 1
-		fmt.Printf("urgency: %d\n", ret)
+		//		fmt.Printf("urgency: %d\n", ret)
 		return ret
 	})
 
@@ -93,7 +69,6 @@ func Schedule(working_hours float64) []Task {
 	for _, t := range ks {
 		minutes_worked += t.Time_estimate
 		total_urgency += t.Urgency
-		set_scheduled_time(t)
 	}
 	if minutes_worked < (time.Duration(working_hours) * 60) {
 		fmt.Printf("Task queue underrun.\n")
@@ -101,7 +76,7 @@ func Schedule(working_hours float64) []Task {
 	if minutes_worked == 0 {
 		fmt.Printf("Task queue empty.\n")
 	}
-	fmt.Printf("Scheduled %d tasks with total urgency %.0f to do in %0.1f/%0.1f hours\n", len(ks), total_urgency, minutes_worked.Hours(), working_hours)
+	fmt.Printf("Scheduled %d/%d tasks with total urgency %.0f to do in %0.1f/%0.1f hours\n", len(ks), len(Tasks), total_urgency, minutes_worked.Hours(), working_hours)
 
 	return ks
 }

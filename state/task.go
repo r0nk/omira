@@ -1,30 +1,10 @@
 package state
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
-	"os"
-	"strings"
 	"time"
 )
-
-/*
-CREATE TABLE tasks (
-        id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        due DATETIME,
-        starting DATETIME,
-        time_estimate INT,
-        finished DATETIME,
-        scheduled DATETIME,
-        priority REAL,
-        urgency REAL,
-        recurrance TEXT,
-        status TEXT,
-        notes TEXT
-);
-*/
 
 type Task struct {
 	id            int
@@ -47,10 +27,15 @@ var Recurring []Task
 var root_path string
 
 func Task_urgency(t Task) float64 {
+	u := 0.0
 	if time.Until(t.Starting) > 0 {
 		return 0
 	}
-	return 1000 - time.Until(t.Due).Hours() + float64((t.Priority * 10))
+	u = 1000 - time.Until(t.Due).Hours() + float64((t.Priority * 10))
+	if u < 0 {
+		u = 0
+	}
+	return u
 }
 
 //https://stackoverflow.com/questions/15323767/does-go-have-if-x-in-construct-similar-to-python
@@ -61,23 +46,6 @@ func stringInSlice(a string, list []string) bool {
 		}
 	}
 	return false
-}
-
-/* this reason this takes the at parameter is in case we're scheduling for the future. */
-func Should_recur(rstr string, at time.Time) bool {
-	now_words := strings.Fields(fmt.Sprintf("%d %d %d \n", int(at.Month()), at.Day(), int(at.Weekday())))
-	recur_words := strings.Fields(rstr)
-	if len(recur_words) < 3 {
-		log.Fatal("Improper Recurrance String: " + rstr)
-	}
-
-	for i, _ := range now_words {
-		split_recur := strings.Split(recur_words[i], ",")
-		if recur_words[i] != "*" && !stringInSlice(now_words[i], split_recur) {
-			return false
-		}
-	}
-	return true
 }
 
 func Task_from_name(name string) Task {
@@ -91,67 +59,14 @@ func Task_from_name(name string) Task {
 	return t
 }
 
-func Insert_recurring_tasks() {
-	for _, r := range Recurring {
-		if Should_recur(r.Recurrance, time.Now()) {
-			Tasks = append(Tasks, r)
-		}
-	}
+func Add_Task(t Task) {
+	fmt.Printf("TODO add task", t)
 }
 
 func Load_Tasks() {
-	Tasks = Load_task_db("select * from tasks")
-	Recurring = Load_task_db("select * from recurring")
-}
-
-func midnight_tonight() time.Time {
-	t := time.Now()
-	return time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location())
-}
-
-func Add_Task(t Task) {
-	if t.Due.Before(midnight_tonight()) {
-		t.Scheduled = time.Now()
-	}
-	filename := "omira.db"
-
-	_, err := os.Stat(filename)
-
-	if os.IsNotExist(err) {
-		log.Fatal("No omira.db file found cannot apply changes.")
-	}
-
-	odb, err := sql.Open("sqlite3", filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer odb.Close()
-
-	statement, err := odb.Prepare("INSERT INTO tasks (name,due,starting,time_estimate,finished,scheduled,priority,urgency,recurrance,status,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?);")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	statement.Exec(t.Name, t.Due, t.Starting, t.Time_estimate, t.Finished, t.Scheduled, t.Priority, t.Urgency, t.Recurrance, t.Status, t.Notes)
+	fmt.Printf("TODO load tasks")
 }
 
 func Finish_Task(name string) {
-	filename := "omira.db"
-
-	_, err := os.Stat(filename)
-
-	if os.IsNotExist(err) {
-		log.Fatal("No omira.db file found cannot apply changes.")
-	}
-
-	odb, err := sql.Open("sqlite3", filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer odb.Close()
-
-	statement, err := odb.Prepare("UPDATE tasks SET status = 'FINISHED' WHERE name = ? AND status != 'FAILED';")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	statement.Exec(name)
+	fmt.Printf("TODO finish task %s\n", name)
 }

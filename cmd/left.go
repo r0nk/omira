@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	state "github.com/r0nk/omira/state"
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +14,7 @@ Example:
 	omira finish $(omira left | fzf)
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, t := range state.Load_task_db("select * from tasks where scheduled = date('now');") {
-			fmt.Printf("%s\n", t.Name)
-		}
+		fmt.Printf("TODO print the tasks that fit for today")
 	},
 }
 

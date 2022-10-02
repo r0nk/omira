@@ -64,13 +64,15 @@ task completion, and is colored based on how much time is left in the day.
 Finished tasks are greyed out, and the unfinished tasks are organized by time estimates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
-		for _, t := range state.Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == strftime(\"%Y-%m-%d\",date('now')) and status=='FINISHED'") {
-			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
-		}
+		fmt.Printf("TODO get finished tasks")
+
+		//		for _, t := range state.Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == strftime(\"%Y-%m-%d\",date('now')) and status=='FINISHED'") {
+		//			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
+		//		}
 
 		var last_minutes_value float64
 		last_minutes_value = -1.0
-		for _, t := range state.Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == strftime(\"%Y-%m-%d\",date('now')) and status!='FINISHED'") {
+		for _, t := range state.Schedule(8) {
 			fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
 			if t.Time_estimate.Minutes() != last_minutes_value {
 				fmt.Printf("%2.0f ", t.Time_estimate.Minutes())
@@ -82,7 +84,8 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 			fmt.Printf("%s\n", t.Name)
 		}
 		fmt.Printf("%s", text.Colors{text.FgCyan}.EscapeSeq())
-		day_percentage := float64(100.0 * ((float64(time.Now().Hour()) - 7) / 16))
+		hour := float64(time.Now().Hour())
+		day_percentage := float64(100.0 * (hour - 7) / 10)
 		discipline := state.Discipline(time.Now())
 
 		for i := 0; i < 100; i += 2 {
