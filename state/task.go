@@ -1,8 +1,12 @@
 package state
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -60,11 +64,43 @@ func Task_from_name(name string) Task {
 }
 
 func Add_Task(t Task) {
-	fmt.Printf("TODO add task", t)
+	Tasks = append(Tasks, t)
+}
+
+func parse_task(line string) Task {
+	var t Task
+	te := 0
+	tokens := strings.Fields(line)
+	if len(tokens) < 3 {
+		fmt.Printf("INVALID LINE: %s\n", line)
+		return t
+	}
+	t.Name = tokens[0]
+	te, _ = strconv.Atoi(tokens[1])
+	t.Time_estimate = time.Minute * time.Duration(te)
+	t.Due = Get_date(tokens[2])
+	t.Urgency = Task_urgency(t)
+	if len(tokens) > 3 {
+		t.Finished = Get_date(tokens[3])
+	}
+	return t
 }
 
 func Load_Tasks() {
-	fmt.Printf("TODO load tasks")
+	file, err := os.Open("example.txt")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		Tasks = append(Tasks, parse_task(scanner.Text()))
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func Finish_Task(name string) {

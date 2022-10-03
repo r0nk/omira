@@ -29,17 +29,18 @@ func check_deadline(t Task, current time.Time) {
 }
 
 func Discipline(t time.Time) float64 {
-	d := t.Format("2006-01-02")
-	fmt.Printf("TODO discipline: %s ", d)
-
-	x := 0
-	y := 0
-
-	if x+y == 0 {
-		return 0
+	year, month, day := t.Date()
+	//fmt.Printf("TODO discipline: %s ", d)
+	//count the number of hours worked for that day, divide by 8
+	ret := 0.0
+	for _, task := range Tasks {
+		y, m, d := task.Finished.Date()
+		if (y == year) && (m == month) && (d == day) {
+			ret += task.Time_estimate.Minutes()
+		}
 	}
-	return 100.0 * (float64(y) / float64(x+y))
-	return 0
+	ret = 100 * (ret / (60 * 8))
+	return ret
 }
 
 func Schedule(working_hours float64) []Task {
