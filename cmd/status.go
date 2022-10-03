@@ -64,11 +64,10 @@ task completion, and is colored based on how much time is left in the day.
 Finished tasks are greyed out, and the unfinished tasks are organized by time estimates.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
-		fmt.Printf("TODO get finished tasks")
 
-		//		for _, t := range state.Load_task_db("select * from tasks where strftime(\"%Y-%m-%d\",scheduled) == strftime(\"%Y-%m-%d\",date('now')) and status=='FINISHED'") {
-		//			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
-		//		}
+		for _, t := range state.Tasks_finished_on(time.Now()) {
+			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
+		}
 
 		var last_minutes_value float64
 		last_minutes_value = -1.0

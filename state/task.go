@@ -65,29 +65,37 @@ func Task_from_name(name string) Task {
 
 func Add_Task(t Task) {
 	Tasks = append(Tasks, t)
+	save_tasks()
 }
 
+//name time_estimate_in_minutes due_date finished_date
+//project/thing 60
 func parse_task(line string) Task {
 	var t Task
 	te := 0
 	tokens := strings.Fields(line)
-	if len(tokens) < 3 {
-		fmt.Printf("INVALID LINE: %s\n", line)
-		return t
-	}
+	//Partial definition, so we'll fill in the blanks
 	t.Name = tokens[0]
-	te, _ = strconv.Atoi(tokens[1])
-	t.Time_estimate = time.Minute * time.Duration(te)
-	t.Due = Get_date(tokens[2])
+	if len(tokens) == 1 {
+		t.Time_estimate = time.Minute * time.Duration(60)
+	} else {
+		te, _ = strconv.Atoi(tokens[1])
+		t.Time_estimate = time.Minute * time.Duration(te)
+	}
+	if len(tokens) == 2 {
+		t.Due = time.Now()
+	} else {
+		t.Due = Get_date(tokens[2])
+	}
 	t.Urgency = Task_urgency(t)
-	if len(tokens) > 3 {
+	if len(tokens) == 4 {
 		t.Finished = Get_date(tokens[3])
 	}
 	return t
 }
 
 func Load_Tasks() {
-	file, err := os.Open("example.txt")
+	file, err := os.Open("todo.txt")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -103,6 +111,34 @@ func Load_Tasks() {
 	}
 }
 
+func save_tasks() {
+
+	file, err := os.OpenFile("todo.txt", os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+	for _, t := range Tasks {
+		if t.Finished.IsZero() {
+			_, err = fmt.Fprintf(file, "%s	%.0f	%s\n", t.Name, t.Time_estimate.Minutes(), t.Due.Format("2006-01-02T15:04-07:00"))
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			_, err = fmt.Fprintf(file, "%s	%.0f	%s	%s\n", t.Name, t.Time_estimate.Minutes(), t.Due.Format("2006-01-02T15:04-07:00"), t.Finished.Format("2006-01-02T15:04-07:00"))
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
+}
+
 func Finish_Task(name string) {
-	fmt.Printf("TODO finish task %s\n", name)
+	for i, t := range Tasks {
+		if t.Name == name && t.Finished.IsZero() {
+			Tasks[i].Finished = time.Now()
+			break
+		}
+	}
+	save_tasks()
 }

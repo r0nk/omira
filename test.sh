@@ -1,6 +1,11 @@
 #!/bin/bash
 
-go build .
+cp tests/example.txt .
+go build . 
+md5sum example.txt
+./omira add LOOKFORME
+md5sum example.txt
+
 ./omira
 ./omira add task
 ./omira add dance

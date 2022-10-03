@@ -28,9 +28,22 @@ func check_deadline(t Task, current time.Time) {
 	}
 }
 
+func Tasks_finished_on(t time.Time) []Task {
+	year, month, day := t.Date()
+	//count the number of hours worked for that day, divide by 8
+	var ret []Task
+	for _, task := range Tasks {
+		y, m, d := task.Finished.Date()
+		if (y == year) && (m == month) && (d == day) {
+			ret = append(ret, task)
+		}
+	}
+	return ret
+}
+
+//Return the percentage of tasks done on a given day
 func Discipline(t time.Time) float64 {
 	year, month, day := t.Date()
-	//fmt.Printf("TODO discipline: %s ", d)
 	//count the number of hours worked for that day, divide by 8
 	ret := 0.0
 	for _, task := range Tasks {
@@ -50,9 +63,12 @@ func Schedule(working_hours float64) []Task {
 
 	ks := knapsack.Get01Solution(uint64(working_hours*60), Tasks, func(t *Task) uint64 {
 		ret := uint64(1)
-		if !t.Starting.Before(time.Now()) {
+		y, _, _ := t.Finished.Date()
+		finished := (y != 1)
+		if !t.Starting.Before(time.Now()) || finished {
 			ret += 999999
 		}
+
 		ret += uint64(t.Time_estimate.Minutes())
 		//		fmt.Printf("name: \"%s\" cost: %d\n", t.Name, ret)
 		return ret
@@ -77,7 +93,7 @@ func Schedule(working_hours float64) []Task {
 	if minutes_worked == 0 {
 		fmt.Printf("Task queue empty.\n")
 	}
-	fmt.Printf("Scheduled %d/%d tasks with total urgency %.0f to do in %0.1f/%0.1f hours\n", len(ks), len(Tasks), total_urgency, minutes_worked.Hours(), working_hours)
+	//	fmt.Printf("Scheduled %d/%d tasks with total urgency %.0f to do in %0.1f/%0.1f hours\n", len(ks), len(Tasks), total_urgency, minutes_worked.Hours(), working_hours)
 
 	return ks
 }

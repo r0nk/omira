@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	state "github.com/r0nk/omira/state"
 	"github.com/spf13/cobra"
@@ -19,7 +20,7 @@ var disciplineCmd = &cobra.Command{
 	Short: "Print the percentage of tasks complete today.",
 	Long:  `Output the percentage of tasks complete to day, to be used in scripts or conkys.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("%f\n", state.Discipline(state.Get_date(date_string)))
+		fmt.Printf("%f\n", state.Discipline(time.Now()))
 	},
 }
 
