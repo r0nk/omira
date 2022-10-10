@@ -65,13 +65,15 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
 
+		worked_minutes := 0.0
 		for _, t := range state.Tasks_finished_on(time.Now()) {
+			worked_minutes += t.Time_estimate.Minutes()
 			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
 		}
 
 		var last_minutes_value float64
 		last_minutes_value = -1.0
-		for _, t := range state.Schedule(8) {
+		for _, t := range state.Schedule(8 - (worked_minutes / 60)) {
 			fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
 			if t.Time_estimate.Minutes() != last_minutes_value {
 				fmt.Printf("%2.0f ", t.Time_estimate.Minutes())

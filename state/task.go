@@ -35,7 +35,11 @@ func Task_urgency(t Task) float64 {
 	if time.Until(t.Starting) > 0 {
 		return 0
 	}
-	u = 1000 - time.Until(t.Due).Hours() + float64((t.Priority * 10))
+	tud := 0.0 //if the time isn't specified, assume its due now
+	if !t.Due.IsZero() {
+		tud = time.Until(t.Due).Hours()
+	}
+	u = 1000 - tud + float64((t.Priority * 10))
 	if u < 0 {
 		u = 0
 	}
@@ -83,7 +87,7 @@ func parse_task(line string) Task {
 		t.Time_estimate = time.Minute * time.Duration(te)
 	}
 	if len(tokens) == 2 {
-		t.Due = time.Now()
+		t.Due = time.Time{} //empty time
 	} else {
 		t.Due = Get_date(tokens[2])
 	}
@@ -103,16 +107,17 @@ func Load_Tasks() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		Tasks = append(Tasks, parse_task(scanner.Text()))
+		s := scanner.Text()
+		if len(s) > 0 {
+			Tasks = append(Tasks, parse_task(scanner.Text()))
+		}
 	}
-
 	if err := scanner.Err(); err != nil {
 		fmt.Println(err)
 	}
 }
 
 func save_tasks() {
-
 	file, err := os.OpenFile("todo.txt", os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println(err)
@@ -120,9 +125,16 @@ func save_tasks() {
 	defer file.Close()
 	for _, t := range Tasks {
 		if t.Finished.IsZero() {
-			_, err = fmt.Fprintf(file, "%s	%.0f	%s\n", t.Name, t.Time_estimate.Minutes(), t.Due.Format("2006-01-02T15:04-07:00"))
-			if err != nil {
-				fmt.Println(err)
+			if t.Due.IsZero() {
+				_, err = fmt.Fprintf(file, "%s	%.0f\n", t.Name, t.Time_estimate.Minutes())
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				_, err = fmt.Fprintf(file, "%s	%.0f	%s\n", t.Name, t.Time_estimate.Minutes(), t.Due.Format("2006-01-02T15:04-07:00"))
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 		} else {
 			_, err = fmt.Fprintf(file, "%s	%.0f	%s	%s\n", t.Name, t.Time_estimate.Minutes(), t.Due.Format("2006-01-02T15:04-07:00"), t.Finished.Format("2006-01-02T15:04-07:00"))
