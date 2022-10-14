@@ -3,6 +3,7 @@ package state
 import (
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/johnmuirjr/go-knapsack"
@@ -76,6 +77,10 @@ func Schedule(working_hours float64) []Task {
 		ret := uint64(t.Urgency) + 1
 		//		fmt.Printf("urgency: %d\n", ret)
 		return ret
+	})
+
+	sort.Slice(ks, func(i int, j int) bool {
+		return ks[i].Time_estimate < ks[j].Time_estimate
 	})
 
 	for _, t := range Tasks {
