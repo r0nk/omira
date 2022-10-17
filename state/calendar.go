@@ -23,12 +23,6 @@ func Get_date(str string) time.Time {
 	return t
 }
 
-func check_deadline(t Task, current time.Time) {
-	if t.Due.Before(current) {
-		fmt.Printf("Task %s won't be completed in time\n", t.Name)
-	}
-}
-
 func Tasks_finished_on(t time.Time) []Task {
 	year, month, day := t.Date()
 	//count the number of hours worked for that day, divide by 8
@@ -75,9 +69,7 @@ func Schedule(working_hours float64) []Task {
 
 	ks := knapsack.Get01Solution(uint64(working_hours*60), Tasks, func(t *Task) uint64 {
 		ret := uint64(1)
-		y, _, _ := t.Finished.Date()
-		finished := (y != 1)
-		if !t.Starting.Before(time.Now()) || finished {
+		if !t.Starting.Before(time.Now()) || !t.Finished.IsZero() {
 			ret += 999999
 		}
 
@@ -94,11 +86,6 @@ func Schedule(working_hours float64) []Task {
 		return ks[i].Time_estimate < ks[j].Time_estimate
 	})
 
-	for _, t := range Tasks {
-		if minutes_worked+t.Time_estimate >= time.Duration(working_hours)*time.Hour {
-			check_deadline(t, time.Now())
-		}
-	}
 	for _, t := range ks {
 		minutes_worked += t.Time_estimate
 		total_urgency += t.Urgency
