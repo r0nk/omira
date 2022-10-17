@@ -45,7 +45,7 @@ func Tasks_finished_on(t time.Time) []Task {
 //Return the percentage of tasks done on a given day
 func Discipline(t time.Time) float64 {
 	year, month, day := t.Date()
-	//count the number of hours worked for that day, divide by 8
+	//count the number of hours worked for that day, divide by 6
 	ret := 0.0
 	for _, task := range Tasks {
 		y, m, d := task.Finished.Date()
@@ -53,7 +53,18 @@ func Discipline(t time.Time) float64 {
 			ret += task.Time_estimate.Minutes()
 		}
 	}
-	ret = 100 * (ret / (60 * 8))
+	ret = 100 * (ret / (60 * 6))
+	return ret
+}
+
+//Return the total urgency of all unfinished tasks
+func Urgency() float64 {
+	ret := 0.0
+	for _, task := range Tasks {
+		if task.Finished.IsZero() {
+			ret += task.Urgency
+		}
+	}
 	return ret
 }
 

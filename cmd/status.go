@@ -73,7 +73,7 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 
 		var last_minutes_value float64
 		last_minutes_value = -1.0
-		for _, t := range state.Schedule(8 - (worked_minutes / 60)) {
+		for _, t := range state.Schedule(6 - (worked_minutes / 60)) {
 			fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
 			if t.Time_estimate.Minutes() != last_minutes_value {
 				fmt.Printf("%2.0f ", t.Time_estimate.Minutes())

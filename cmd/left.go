@@ -20,7 +20,7 @@ Example:
 		for _, t := range state.Tasks_finished_on(time.Now()) {
 			worked_minutes += t.Time_estimate.Minutes()
 		}
-		for _, t := range state.Schedule(8 - (worked_minutes / 60)) {
+		for _, t := range state.Schedule(6 - (worked_minutes / 60)) {
 			fmt.Printf("%s\n", t.Name)
 		}
 	},
