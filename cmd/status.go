@@ -112,9 +112,7 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 			fmt.Printf("\x1b[0m")
 		}
 		avg /= 50
-		discipline_percentage_color(avg)
-		fmt.Printf(" %c \n", percent_to_grade(avg))
-		fmt.Printf("\x1b[0m")
+		fmt.Printf(" %0.1f\n", state.Urgency())
 	},
 }
 
