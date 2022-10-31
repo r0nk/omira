@@ -86,7 +86,7 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 		}
 		fmt.Printf("%s", text.Colors{text.FgCyan}.EscapeSeq())
 		hour := float64(time.Now().Hour())
-		day_percentage := float64(100.0 * (hour - 7) / 10)
+		day_percentage := float64(100.0 * (hour - 9) / 8)
 		discipline := state.Discipline(time.Now())
 
 		for i := 0; i < 100; i += 2 {

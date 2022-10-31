@@ -33,7 +33,6 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.PersistentFlags().StringVar(&sqlite_file, "db", "b", "Path for sqlite file used")
 
 	state.Load_Tasks()
 	signal.Ignore(syscall.SIGPIPE) // don't tell the user the pipe was closed early.
