@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -44,16 +45,6 @@ func Task_urgency(t Task) float64 {
 		u = 0
 	}
 	return u
-}
-
-//https://stackoverflow.com/questions/15323767/does-go-have-if-x-in-construct-similar-to-python
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }
 
 func Task_from_name(name string) Task {
@@ -122,6 +113,9 @@ func save_tasks() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	sort.Slice(Tasks, func(i int, j int) bool {
+		return Tasks[i].Finished.Before(Tasks[j].Finished)
+	})
 	defer file.Close()
 	for _, t := range Tasks {
 		if t.Finished.IsZero() {
