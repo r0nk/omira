@@ -114,7 +114,10 @@ func save_tasks() {
 		fmt.Println(err)
 	}
 	sort.Slice(Tasks, func(i int, j int) bool {
-		return Tasks[i].Finished.Before(Tasks[j].Finished)
+		if Tasks[j].Finished.IsZero() {
+			return true
+		}
+		return Tasks[j].Finished.Before(Tasks[i].Finished) //j<i
 	})
 	defer file.Close()
 	for _, t := range Tasks {
