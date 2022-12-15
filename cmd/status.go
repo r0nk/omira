@@ -31,7 +31,7 @@ func unicode_bar_from_percentage(x float64) string {
 
 func discipline_percentage_color(x float64) (int, error) {
 	switch {
-	case x == 100.0:
+	case x > 100.0:
 		return fmt.Printf("%s", text.Colors{text.FgHiCyan}.EscapeSeq())
 	case x > 80.0:
 		return fmt.Printf("%s", text.Colors{text.FgGreen}.EscapeSeq())
@@ -73,16 +73,18 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 
 		var last_minutes_value float64
 		last_minutes_value = -1.0
-		for _, t := range state.Schedule(6 - (worked_minutes / 60)) {
-			fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
-			if t.Time_estimate.Minutes() != last_minutes_value {
-				fmt.Printf("%2.0f ", t.Time_estimate.Minutes())
-				last_minutes_value = t.Time_estimate.Minutes()
-			} else {
-				fmt.Printf("   ")
+		if (6 - (worked_minutes / 60)) > 0 {
+			for _, t := range state.Schedule(6 - (worked_minutes / 60)) {
+				fmt.Printf("%s", text.Colors{text.FgYellow}.EscapeSeq())
+				if t.Time_estimate.Minutes() != last_minutes_value {
+					fmt.Printf("%2.0f ", t.Time_estimate.Minutes())
+					last_minutes_value = t.Time_estimate.Minutes()
+				} else {
+					fmt.Printf("   ")
+				}
+				fmt.Printf("\x1b[0m")
+				fmt.Printf("%s\n", t.Name)
 			}
-			fmt.Printf("\x1b[0m")
-			fmt.Printf("%s\n", t.Name)
 		}
 		fmt.Printf("%s", text.Colors{text.FgCyan}.EscapeSeq())
 		minute := float64(time.Now().Minute())
