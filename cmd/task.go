@@ -18,7 +18,7 @@ the second the task name,
 the third the time estimate.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, t := range state.Tasks {
-			if !t.Finished.IsZero() {
+			if t.Finished.IsZero() {
 				fmt.Printf("%.0f %s %.0fh\n", t.Urgency, t.Name, time.Until(t.Due).Hours())
 			}
 		}
