@@ -41,6 +41,13 @@ func Task_urgency(t Task) float64 {
 		tud = time.Until(t.Due).Hours()
 	}
 	u = 1000 - tud + float64((t.Priority * 10))
+	//check for prerequisites (anything with the same starting path)
+	//"mow_lawn/get_gas" is a prerequisite of "mowlawn"
+	for _, prereq := range Tasks {
+		if strings.HasPrefix(prereq.Name, t.Name+"/") {
+			u -= 200
+		}
+	}
 	if u < 0 {
 		u = 0
 	}
