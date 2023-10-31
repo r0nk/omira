@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/johnmuirjr/go-knapsack"
@@ -83,7 +84,15 @@ func Schedule(working_hours float64) []Task {
 	})
 
 	sort.Slice(ks, func(i int, j int) bool {
-		return ks[i].Time_estimate < ks[j].Time_estimate
+		if ks[i].Time_estimate == ks[j].Time_estimate {
+			if len(ks[i].Name) == len(ks[j].Name) {
+				return strings.Compare(ks[i].Name, ks[j].Name) < 0
+			} else {
+				return (len(ks[i].Name) < len(ks[j].Name))
+			}
+		} else {
+			return ks[i].Time_estimate < ks[j].Time_estimate
+		}
 	})
 
 	for _, t := range ks {

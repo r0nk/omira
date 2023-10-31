@@ -65,12 +65,14 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 	Run: func(cmd *cobra.Command, args []string) {
 		text.EnableColors()
 
+		//finished tasks
 		worked_minutes := 0.0
 		for _, t := range state.Tasks_finished_on(time.Now()) {
 			worked_minutes += t.Time_estimate.Minutes()
 			fmt.Printf("%s\n", text.Colors{text.FgHiBlack}.Sprintf("%s", t.Name))
 		}
 
+		//tasks left
 		var last_minutes_value float64
 		last_minutes_value = -1.0
 		if (6 - (worked_minutes / 60)) > 0 {
@@ -87,6 +89,8 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 			}
 		}
 		fmt.Printf("%s", text.Colors{text.FgCyan}.EscapeSeq())
+
+		//day discipline bar
 		minute := float64(time.Now().Minute())
 		hour := float64(time.Now().Hour()) + (minute / 60)
 		day_percentage := float64(100.0 * (hour - 9) / 8)
@@ -106,6 +110,7 @@ Finished tasks are greyed out, and the unfinished tasks are organized by time es
 		fmt.Printf(" %0.1f\n", state.Discipline(time.Now()))
 		fmt.Printf("\x1b[0m")
 
+		//week disicipline
 		var avg float64
 		for i := 0; i < 50; i += 1 {
 			d := state.Discipline(time.Now().Add(-time.Hour * time.Duration(24*(49-i))))
