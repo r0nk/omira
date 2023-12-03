@@ -69,17 +69,19 @@ func Schedule(working_hours float64) []Task {
 	//	Insert_recurring_tasks()
 
 	ks := knapsack.Get01Solution(uint64(working_hours*60), Tasks, func(t *Task) uint64 {
+		//getWeight
 		ret := uint64(1)
 		if !t.Starting.Before(time.Now()) || !t.Finished.IsZero() {
 			ret += 999999
 		}
 
 		ret += uint64(t.Time_estimate.Minutes())
-		//		fmt.Printf("name: \"%s\" cost: %d\n", t.Name, ret)
+		//fmt.Printf("name: \"%s\" cost: %d\n", t.Name, ret)
 		return ret
 	}, func(t *Task) uint64 {
+		//getValue
 		ret := uint64(t.Urgency) + 1
-		//		fmt.Printf("urgency: %d\n", ret)
+		//fmt.Printf("urgency: %d\n", ret)
 		return ret
 	})
 

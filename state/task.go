@@ -19,7 +19,6 @@ type Task struct {
 	Time_estimate time.Duration
 	Finished      time.Time
 	Scheduled     time.Time
-	Priority      int
 	Urgency       float64
 	Recurrance    string
 	Status        string
@@ -33,14 +32,16 @@ var root_path string
 
 func Task_urgency(t Task) float64 {
 	u := 0.0
-	if time.Until(t.Starting) > 0 {
+	if time.Until(t.Starting) > 0 || !t.Finished.IsZero() {
 		return 0
 	}
 	tud := 0.0 //if the time isn't specified, assume its due now
 	if !t.Due.IsZero() {
 		tud = time.Until(t.Due).Hours()
 	}
-	u = 1000 - tud + float64((t.Priority * 10))
+	u = 1000 - tud
+	//TODO probably exists a better way to break ties.
+	u -= float64(int(t.Name[0])%100) / 100.0 // break common ties to make scheduling more consistent
 	//check for prerequisites (anything with the same starting path)
 	//"mow_lawn/get_gas" is a prerequisite of "mowlawn"
 	for _, prereq := range Tasks {
