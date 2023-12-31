@@ -38,7 +38,7 @@ func projects_from_tasks() {
 			duration += task.Time_estimate
 		}
 
-		velocity /= 7
+		velocity /= 7.0
 		if duration == completed { //dont print finished projects
 			continue
 		}
@@ -46,7 +46,7 @@ func projects_from_tasks() {
 		velocity_percentage := 100.0 * float32(velocity.Minutes()/duration.Minutes())
 		//		fmt.Printf("velocity_percentage: %f\n", velocity_percentage)
 
-		fmt.Printf("%s %s %0.1f%% +%0.1f%% ", key, left, 100*(completed.Hours()/duration.Hours()), velocity_percentage)
+		fmt.Printf("%s %s %0.1f%% +%0.1f%% %0.1f ", key, left, 100*(completed.Hours()/duration.Hours()), velocity_percentage, velocity.Minutes())
 		if velocity == 0.0 {
 			fmt.Printf("never")
 		} else {
