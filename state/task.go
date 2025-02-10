@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -97,6 +99,22 @@ func parse_task(line string) Task {
 	return t
 }
 
+func check_if_todo(path string, f os.FileInfo, err error) error {
+	hidden := f.Name()[0] == '.' && len(f.Name()) > 2
+	has_whitespace := regexp.MustCompile(`\s`).MatchString(f.Name())
+	if f.IsDir() && (hidden || has_whitespace) {
+		return filepath.SkipDir
+	}
+	if f.Name() == "todo.txt" {
+		fmt.Printf("Visited: %s\n", path)
+	}
+	return nil
+}
+
+func Find_todo_files() {
+	filepath.Walk(".", check_if_todo)
+}
+
 func Load_Tasks() {
 	file, err := os.Open("todo.txt")
 	if err != nil {
@@ -123,7 +141,7 @@ func save_tasks() {
 	}
 	sort.Slice(Tasks, func(i int, j int) bool {
 		if Tasks[j].Finished.IsZero() {
-			return true
+			return Task_urgency(Tasks[i]) < Task_urgency(Tasks[j])
 		}
 		return Tasks[j].Finished.Before(Tasks[i].Finished) //j<i
 	})

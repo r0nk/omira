@@ -9,8 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var sqlite_file string
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "omira",
@@ -32,8 +30,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
 	state.Load_Tasks()
 	signal.Ignore(syscall.SIGPIPE) // don't tell the user the pipe was closed early.
 }
